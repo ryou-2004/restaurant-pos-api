@@ -1,7 +1,5 @@
 module Api::Staff
   class AuthenticationController < ActionController::API
-    skip_before_action :verify_authenticity_token, if: :json_request?
-
     def login
       staff_user = StaffUser.find_by(email: params[:email])
 
@@ -57,10 +55,6 @@ module Api::Staff
       end
     rescue
       nil
-    end
-
-    def json_request?
-      request.format.json?
     end
   end
 end

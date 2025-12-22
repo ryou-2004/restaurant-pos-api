@@ -1,7 +1,5 @@
 module Api::Store
   class AuthenticationController < ActionController::API
-    skip_before_action :verify_authenticity_token, if: :json_request?
-
     def login
       user = TenantUser.find_by(email: params[:email])
 
@@ -67,10 +65,6 @@ module Api::Store
       end
     rescue
       nil
-    end
-
-    def json_request?
-      request.format.json?
     end
   end
 end
