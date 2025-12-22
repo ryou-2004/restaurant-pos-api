@@ -1,0 +1,188 @@
+# RuboCop設定ファイル
+# Restaurant POS System - Rails API
+
+require:
+  - rubocop-rails
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.3
+  NewCops: enable
+  Exclude:
+    - 'db/schema.rb'
+    - 'db/migrate/**/*'
+    - 'bin/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - 'tmp/**/*'
+    - 'log/**/*'
+
+# ========================================
+# スタイル・フォーマット
+# ========================================
+
+# 日本語コメントを許可
+Style/AsciiComments:
+  Enabled: false
+
+# 文字列リテラルはシングルクォート優先
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: single_quotes
+
+# ドキュメントコメントは必須としない（日本語コメントで代用）
+Style/Documentation:
+  Enabled: false
+
+# クラス・モジュールの空行を許可
+Layout/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Layout/EmptyLinesAroundModuleBody:
+  Enabled: false
+
+# メソッド定義の空行は柔軟に
+Layout/EmptyLinesAroundMethodBody:
+  Enabled: false
+
+# ========================================
+# メトリクス（複雑度制限）
+# ========================================
+
+# メソッドの行数制限を緩和
+Metrics/MethodLength:
+  Max: 30
+  Exclude:
+    - 'spec/**/*'
+
+# クラスの行数制限を緩和
+Metrics/ClassLength:
+  Max: 200
+  Exclude:
+    - 'spec/**/*'
+
+# ブロックの行数制限を緩和
+Metrics/BlockLength:
+  Max: 50
+  Exclude:
+    - 'spec/**/*'
+    - 'config/routes.rb'
+    - 'config/environments/*.rb'
+
+# 循環的複雑度の制限
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+# ABCメトリクス（代入・分岐・条件の複雑度）
+Metrics/AbcSize:
+  Max: 25
+  Exclude:
+    - 'spec/**/*'
+
+# ========================================
+# Rails特有のルール
+# ========================================
+
+# モデルのバリデーション順序を強制しない
+Rails/LexicallyScopedActionFilter:
+  Enabled: false
+
+# has_many :through の inverse_of を必須としない
+Rails/InverseOf:
+  Enabled: false
+
+# ========================================
+# Naming（命名規則）
+# ========================================
+
+# 定数名の制限を緩和
+Naming/ConstantName:
+  Enabled: true
+
+# メソッド名のチェック
+Naming/MethodName:
+  Enabled: true
+
+# 変数名のチェック
+Naming/VariableName:
+  Enabled: true
+
+# ========================================
+# Layout（レイアウト）
+# ========================================
+
+# 行の長さ制限
+Layout/LineLength:
+  Max: 120
+  IgnoredPatterns:
+    - '\s*#'  # コメント行は除外
+
+# インデントはスペース2つ
+Layout/IndentationWidth:
+  Width: 2
+
+# ハッシュの配置
+Layout/HashAlignment:
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+
+# 引数の配置
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_first_argument
+
+# ========================================
+# Lint（潜在的なバグ検出）
+# ========================================
+
+# 使用されていない変数を警告
+Lint/UselessAssignment:
+  Enabled: true
+
+# 到達不可能なコードを警告
+Lint/UnreachableCode:
+  Enabled: true
+
+# Rescueで例外を握りつぶさない
+Lint/SuppressedException:
+  Enabled: true
+  AllowComments: true
+
+# ========================================
+# RSpec特有のルール
+# ========================================
+
+# RSpecのExampleの長さ制限
+RSpec/ExampleLength:
+  Max: 20
+
+# RSpecの複数Expectationを許可
+RSpec/MultipleExpectations:
+  Max: 5
+
+# ネストの深さ制限
+RSpec/NestedGroups:
+  Max: 5
+
+# let定義の数制限
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
+# ========================================
+# セキュリティ
+# ========================================
+
+# evalの使用を禁止
+Security/Eval:
+  Enabled: true
+
+# ========================================
+# パフォーマンス
+# ========================================
+
+# 文字列の連結は最適化を推奨
+Performance/StringReplacement:
+  Enabled: true
+
+# 配列の操作を最適化
+Performance/FlatMap:
+  Enabled: true
