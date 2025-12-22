@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_22_120817) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_22_131203) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -92,6 +92,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_22_120817) do
     t.index ["tenant_id"], name: "index_payments_on_tenant_id"
   end
 
+  create_table "staff_users", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "name", null: false
+    t.string "password_digest", null: false
+    t.integer "role", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_staff_users_on_email", unique: true
+    t.index ["role"], name: "index_staff_users_on_role"
+  end
+
   create_table "subscriptions", force: :cascade do |t|
     t.bigint "tenant_id", null: false
     t.integer "plan", default: 0, null: false
@@ -106,15 +117,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_22_120817) do
     t.index ["tenant_id"], name: "index_subscriptions_on_tenant_id"
   end
 
-  create_table "tenants", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "subdomain", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["subdomain"], name: "index_tenants_on_subdomain", unique: true
-  end
-
-  create_table "users", force: :cascade do |t|
+  create_table "tenant_users", force: :cascade do |t|
     t.bigint "tenant_id", null: false
     t.string "email", null: false
     t.string "name", null: false
@@ -122,9 +125,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_22_120817) do
     t.integer "role", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["role"], name: "index_users_on_role"
-    t.index ["tenant_id", "email"], name: "index_users_on_tenant_id_and_email", unique: true
-    t.index ["tenant_id"], name: "index_users_on_tenant_id"
+    t.index ["role"], name: "index_tenant_users_on_role"
+    t.index ["tenant_id", "email"], name: "index_tenant_users_on_tenant_id_and_email", unique: true
+    t.index ["tenant_id"], name: "index_tenant_users_on_tenant_id"
+  end
+
+  create_table "tenants", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "subdomain", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["subdomain"], name: "index_tenants_on_subdomain", unique: true
   end
 
   add_foreign_key "kitchen_queues", "orders"
@@ -136,5 +147,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_22_120817) do
   add_foreign_key "payments", "orders"
   add_foreign_key "payments", "tenants"
   add_foreign_key "subscriptions", "tenants"
-  add_foreign_key "users", "tenants"
+  add_foreign_key "tenant_users", "tenants"
 end

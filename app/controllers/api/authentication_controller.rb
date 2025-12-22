@@ -1,11 +1,9 @@
 module Api
   class AuthenticationController < ApplicationController
-    # ログインとユーザー情報取得以外は認証不要
     skip_before_action :authenticate_request, only: [:login]
 
-    # POST /api/auth/login
     def login
-      user = User.find_by(email: params[:email])
+      user = TenantUser.find_by(email: params[:email])
 
       if user&.authenticate(params[:password])
         token = JsonWebToken.encode(user_id: user.id, tenant_id: user.tenant_id)
@@ -20,7 +18,6 @@ module Api
       end
     end
 
-    # GET /api/auth/me
     def me
       render json: {
         user: user_response(current_user),
@@ -28,10 +25,7 @@ module Api
       }, status: :ok
     end
 
-    # POST /api/auth/logout
     def logout
-      # JWTはステートレスなのでサーバー側で無効化する必要はない
-      # クライアント側でトークンを削除する
       render json: { message: 'ログアウトしました' }, status: :ok
     end
 

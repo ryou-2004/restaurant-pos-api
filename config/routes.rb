@@ -1,43 +1,54 @@
 Rails.application.routes.draw do
-  # ========================================
-  # ヘルスチェック
-  # ========================================
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # ========================================
-  # API
-  # ========================================
   namespace :api do
-    # 認証関連
     post 'auth/login', to: 'authentication#login'
     get 'auth/me', to: 'authentication#me'
     post 'auth/logout', to: 'authentication#logout'
 
-    # メニュー項目
-    resources :menu_items, only: [:index, :show, :create, :update, :destroy]
-
-    # 注文管理
-    resources :orders, only: [:index, :show, :create, :update, :destroy] do
-      member do
-        patch :start_cooking
-        patch :mark_as_ready
-        patch :deliver
+    namespace :staff do
+      resources :orders, only: [:index, :show, :create, :update] do
+        member do
+          patch :start_cooking
+          patch :mark_as_ready
+          patch :deliver
+        end
       end
+
+      resources :kitchen_queues, only: [:index, :show, :update] do
+        member do
+          patch :start
+          patch :complete
+        end
+      end
+
+      resources :payments, only: [:index, :show, :create] do
+        member do
+          patch :complete
+        end
+      end
+
+      resources :menu_items, only: [:index, :show]
     end
 
-    # 厨房キュー
-    resources :kitchen_queues, only: [:index, :show, :update] do
-      member do
-        patch :start_cooking
-        patch :complete
+    namespace :admin do
+      resources :menu_items
+      resources :users do
+        member do
+          patch :activate
+          patch :deactivate
+        end
       end
-    end
 
-    # 会計
-    resources :payments, only: [:index, :show, :create, :update] do
-      member do
-        patch :complete
+      resources :reports, only: [:index] do
+        collection do
+          get :daily
+          get :monthly
+          get :by_menu_item
+        end
       end
+
+      resource :subscription, only: [:show, :update]
     end
   end
 end
