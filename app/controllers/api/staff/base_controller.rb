@@ -1,5 +1,4 @@
-module Api::Staff
-  class BaseController < ActionController::API
+class Api::Staff::BaseController < ActionController::API
     before_action :authenticate_staff_user
     before_action :set_current_staff_user
 
@@ -34,5 +33,4 @@ module Api::Staff
         render json: { error: 'システム管理者権限が必要です' }, status: :forbidden
       end
     end
-  end
 end

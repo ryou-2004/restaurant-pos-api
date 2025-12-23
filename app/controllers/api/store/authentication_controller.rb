@@ -1,5 +1,4 @@
-module Api::Store
-  class AuthenticationController < ActionController::API
+class Api::Store::AuthenticationController < ActionController::API
     def login
       user = TenantUser.find_by(email: params[:email])
 
@@ -66,5 +65,4 @@ module Api::Store
     rescue
       nil
     end
-  end
 end

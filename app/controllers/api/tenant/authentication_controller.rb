@@ -1,5 +1,4 @@
-module Api::Tenant
-  class AuthenticationController < ActionController::API
+class Api::Tenant::AuthenticationController < ActionController::API
     def login
       user = TenantUser.find_by(email: params[:email])
 
@@ -78,5 +77,4 @@ module Api::Tenant
     rescue
       nil
     end
-  end
 end

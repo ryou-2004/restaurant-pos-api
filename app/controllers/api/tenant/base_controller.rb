@@ -1,5 +1,4 @@
-module Api::Tenant
-  class BaseController < ActionController::API
+class Api::Tenant::BaseController < ActionController::API
     before_action :authenticate_tenant_user
     before_action :set_current_tenant
     before_action :require_tenant_dashboard_access
@@ -44,5 +43,4 @@ module Api::Tenant
         render json: { error: 'オーナー権限が必要です' }, status: :forbidden
       end
     end
-  end
 end

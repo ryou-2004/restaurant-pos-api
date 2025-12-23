@@ -1,5 +1,4 @@
-module Api::Store
-  class BaseController < ActionController::API
+class Api::Store::BaseController < ActionController::API
     before_action :authenticate_tenant_user
     before_action :set_current_tenant
 
@@ -31,5 +30,4 @@ module Api::Store
       Current.tenant = @current_user.tenant
       Current.user = @current_user
     end
-  end
 end
