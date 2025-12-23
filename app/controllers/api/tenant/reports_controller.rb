@@ -2,42 +2,31 @@ class Api::Tenant::ReportsController < Api::Tenant::BaseController
   before_action :require_manager_or_above
 
   def index
-    render json: {
-      message: '売上レポート一覧（実装予定）'
-    }
+    render :index
   end
 
   def daily
-    date = params[:date] ? Date.parse(params[:date]) : Date.current
-    orders = current_tenant.orders
-                           .where('created_at >= ? AND created_at < ?', date.beginning_of_day, date.end_of_day)
-                           .where(status: :paid)
+    @date = params[:date] ? Date.parse(params[:date]) : Date.current
+    @orders = current_tenant.orders
+                            .where('created_at >= ? AND created_at < ?', @date.beginning_of_day, @date.end_of_day)
+                            .where(status: :paid)
 
-    render json: {
-      date: date,
-      total_orders: orders.count,
-      total_amount: orders.sum(:total_amount),
-      orders: orders.map { |order| order_summary(order) }
-    }
+    render :daily
   end
 
   def monthly
-    year = params[:year]&.to_i || Date.current.year
-    month = params[:month]&.to_i || Date.current.month
-    start_date = Date.new(year, month, 1).beginning_of_day
+    @year = params[:year]&.to_i || Date.current.year
+    @month = params[:month]&.to_i || Date.current.month
+    start_date = Date.new(@year, @month, 1).beginning_of_day
     end_date = start_date.end_of_month.end_of_day
 
-    orders = current_tenant.orders
-                           .where('created_at >= ? AND created_at <= ?', start_date, end_date)
-                           .where(status: :paid)
+    @orders = current_tenant.orders
+                            .where('created_at >= ? AND created_at <= ?', start_date, end_date)
+                            .where(status: :paid)
 
-    render json: {
-      year: year,
-      month: month,
-      total_orders: orders.count,
-      total_amount: orders.sum(:total_amount),
-      daily_breakdown: daily_breakdown(orders, start_date, end_date)
-    }
+    @daily_breakdown = build_daily_breakdown(@orders, start_date, end_date)
+
+    render :monthly
   end
 
   def by_menu_item
@@ -50,21 +39,14 @@ class Api::Tenant::ReportsController < Api::Tenant::BaseController
                            .group(:menu_item_id)
                            .select('menu_item_id, SUM(quantity) as total_quantity, SUM(unit_price * quantity) as total_sales')
 
-    render json: order_items.map { |item| menu_item_sales(item) }
+    @menu_item_sales = order_items.map { |item| build_menu_item_sales(item) }
+
+    render :by_menu_item
   end
 
   private
 
-  def order_summary(order)
-    {
-      id: order.id,
-      order_number: order.order_number,
-      total_amount: order.total_amount,
-      created_at: order.created_at
-    }
-  end
-
-  def daily_breakdown(orders, start_date, end_date)
+  def build_daily_breakdown(orders, start_date, end_date)
     breakdown = {}
     current_date = start_date.to_date
 
@@ -80,7 +62,7 @@ class Api::Tenant::ReportsController < Api::Tenant::BaseController
     breakdown
   end
 
-  def menu_item_sales(item)
+  def build_menu_item_sales(item)
     menu_item = MenuItem.find(item.menu_item_id)
     {
       menu_item_id: item.menu_item_id,
