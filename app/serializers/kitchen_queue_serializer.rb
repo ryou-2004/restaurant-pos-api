@@ -27,7 +27,7 @@ class KitchenQueueSerializer
     {
       id: @kitchen_queue.order.id,
       order_number: @kitchen_queue.order.order_number,
-      table_number: @kitchen_queue.order.table_number,
+      table_id: @kitchen_queue.order.table_id,
       notes: @kitchen_queue.order.notes,
       order_items: order_items_json
     }

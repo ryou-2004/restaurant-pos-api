@@ -25,7 +25,7 @@ class PaymentSerializer
     {
       id: @payment.order.id,
       order_number: @payment.order.order_number,
-      table_number: @payment.order.table_number,
+      table_id: @payment.order.table_id,
       total_amount: @payment.order.total_amount,
       status: @payment.order.status
     }

@@ -8,7 +8,7 @@ class OrderSerializer
       id: @order.id,
       order_number: @order.order_number,
       status: @order.status,
-      table_number: @order.table_number,
+      table_id: @order.table_id,
       total_amount: @order.total_amount,
       item_count: @order.item_count,
       notes: @order.notes,
