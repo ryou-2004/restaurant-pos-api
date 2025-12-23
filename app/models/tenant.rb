@@ -3,6 +3,7 @@ class Tenant < ApplicationRecord
   has_many :tenant_users, dependent: :destroy
   has_many :menu_items, dependent: :destroy
   has_many :orders, dependent: :destroy
+  has_many :kitchen_queues, dependent: :destroy
 
   validates :name, presence: true, length: { maximum: 255 }
   validates :subdomain, presence: true,
