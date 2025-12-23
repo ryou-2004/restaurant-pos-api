@@ -37,7 +37,7 @@ class OrderService
 
   def build_order(params)
     @tenant.orders.create!(
-      table_number: params[:table_number],
+      table_id: params[:table_id],
       notes: params[:notes],
       status: :pending
     )
