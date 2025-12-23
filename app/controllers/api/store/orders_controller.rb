@@ -100,7 +100,7 @@ class Api::Store::OrdersController < Api::Store::BaseController
 
   def order_params
     params.require(:order).permit(
-      :table_number,
+      :table_id,
       :notes,
       order_items_attributes: [:menu_item_id, :quantity, :notes]
     )
