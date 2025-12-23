@@ -30,4 +30,8 @@ class Api::Store::BaseController < ActionController::API
       Current.tenant = @current_user.tenant
       Current.user = @current_user
     end
+
+    def current_tenant
+      Current.tenant
+    end
 end
