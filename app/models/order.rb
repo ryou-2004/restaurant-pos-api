@@ -11,6 +11,9 @@ class Order < ApplicationRecord
   has_one :kitchen_queue, dependent: :destroy
   has_one :payment, dependent: :destroy
 
+  # ネストされた属性の受け入れ
+  accepts_nested_attributes_for :order_items, allow_destroy: true
+
   # ========================================
   # Enum定義
   # ========================================
