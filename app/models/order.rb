@@ -36,7 +36,7 @@ class Order < ApplicationRecord
   # ========================================
   # コールバック
   # ========================================
-  before_create :generate_order_number
+  before_validation :generate_order_number, on: :create
   after_update :broadcast_status_change, if: :saved_change_to_status?
 
   # ========================================
