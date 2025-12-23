@@ -12,7 +12,11 @@ class Api::Store::OrdersController < Api::Store::BaseController
   def index
     @orders = current_tenant.orders
                             .includes(:order_items => :menu_item)
-                            .order(created_at: :desc)
+
+    # status パラメータでフィルタリング
+    @orders = @orders.where(status: params[:status]) if params[:status].present?
+
+    @orders = @orders.order(created_at: :desc)
 
     render json: @orders.map { |order| OrderSerializer.new(order).as_json }
   end
