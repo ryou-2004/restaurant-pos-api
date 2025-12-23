@@ -5,10 +5,6 @@ class OrderService
 
   # 注文作成の一連の処理をトランザクションで実行
   def create_order(params)
-    Rails.logger.debug "=== OrderService#create_order ==="
-    Rails.logger.debug "params: #{params.inspect}"
-    Rails.logger.debug "order_items_attributes: #{params[:order_items_attributes].inspect}"
-
     ActiveRecord::Base.transaction do
       order = build_order(params)
       add_order_items(order, params[:order_items_attributes])
@@ -48,23 +44,16 @@ class OrderService
   end
 
   def add_order_items(order, items_params)
-    Rails.logger.debug "=== add_order_items ==="
-    Rails.logger.debug "items_params.blank?: #{items_params.blank?}"
-    Rails.logger.debug "items_params.class: #{items_params.class}"
-
     return if items_params.blank?
 
     items_params.each do |item_params|
-      Rails.logger.debug "item_params: #{item_params.inspect}"
-      Rails.logger.debug "menu_item_id: #{item_params[:menu_item_id]}"
-
-      menu_item = @tenant.menu_items.find(item_params[:menu_item_id])
+      menu_item = @tenant.menu_items.find(item_params['menu_item_id'])
 
       order.order_items.create!(
         menu_item: menu_item,
-        quantity: item_params[:quantity],
+        quantity: item_params['quantity'],
         unit_price: menu_item.price,
-        notes: item_params[:notes]
+        notes: item_params['notes']
       )
     end
   end
