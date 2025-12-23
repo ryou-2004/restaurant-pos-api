@@ -47,13 +47,13 @@ class OrderService
     return if items_params.blank?
 
     items_params.each do |item_params|
-      menu_item = @tenant.menu_items.find(item_params['menu_item_id'])
+      menu_item = @tenant.menu_items.find(item_params[:menu_item_id])
 
       order.order_items.create!(
         menu_item: menu_item,
-        quantity: item_params['quantity'],
+        quantity: item_params[:quantity],
         unit_price: menu_item.price,
-        notes: item_params['notes']
+        notes: item_params[:notes]
       )
     end
   end

@@ -25,7 +25,7 @@ class Api::Store::OrdersController < Api::Store::BaseController
   # POST /api/store/orders
   def create
     service = OrderService.new(current_tenant)
-    @order = service.create_order(order_params.to_h.symbolize_keys)
+    @order = service.create_order(order_params.to_h.deep_symbolize_keys)
 
     render json: OrderSerializer.new(@order).as_json, status: :created
   rescue ActiveRecord::RecordInvalid => e
