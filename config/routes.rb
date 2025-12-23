@@ -17,12 +17,7 @@ Rails.application.routes.draw do
       post 'auth/logout', to: 'authentication#logout'
 
       resources :menu_items
-      resources :users do
-        member do
-          patch :activate
-          patch :deactivate
-        end
-      end
+      resources :users
 
       resources :reports, only: [:index] do
         collection do

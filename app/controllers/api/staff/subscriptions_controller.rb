@@ -1,4 +1,4 @@
-class Api::Staff::SubscriptionsController < BaseController
+class Api::Staff::SubscriptionsController < Api::Staff::BaseController
   before_action :set_subscription, only: [:show, :update]
 
   def index

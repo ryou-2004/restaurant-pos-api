@@ -1,46 +1,43 @@
 class Api::Tenant::BaseController < ActionController::API
-    before_action :authenticate_tenant_user
-    before_action :set_current_tenant
-    before_action :require_tenant_dashboard_access
+  before_action :authenticate_tenant_user
+  before_action :set_current_tenant
 
-    attr_reader :current_user
+  attr_reader :current_tenant_user, :current_tenant
 
-    private
+  private
 
-    def authenticate_tenant_user
-      header = request.headers['Authorization']
-      token = header.split(' ').last if header
-      decoded = JsonWebToken.decode(token)
+  def authenticate_tenant_user
+    header = request.headers['Authorization']
+    token = header.split(' ').last if header
+    decoded = JsonWebToken.decode(token)
 
-      if decoded && decoded[:user_type] == 'tenant'
-        @current_user = TenantUser.find_by(id: decoded[:user_id])
-
-        unless @current_user
-          render json: { error: 'ユーザーが見つかりません' }, status: :unauthorized
-        end
-      else
-        render json: { error: '認証に失敗しました' }, status: :unauthorized
+    if decoded && decoded[:user_type] == 'tenant'
+      @current_tenant_user = TenantUser.includes(:tenant).find_by(id: decoded[:tenant_user_id])
+      unless @current_tenant_user
+        render json: { error: 'ユーザーが見つかりません' }, status: :unauthorized
       end
-    rescue ActiveRecord::RecordNotFound
-      render json: { error: 'ユーザーが見つかりません' }, status: :unauthorized
+    else
+      render json: { error: '認証に失敗しました' }, status: :unauthorized
     end
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'ユーザーが見つかりません' }, status: :unauthorized
+  end
 
-    def set_current_tenant
-      return unless @current_user
+  def set_current_tenant
+    @current_tenant = @current_tenant_user&.tenant
+    Current.tenant = @current_tenant if @current_tenant
+    Current.user = @current_tenant_user if @current_tenant_user
+  end
 
-      Current.tenant = @current_user.tenant
-      Current.user = @current_user
+  def require_owner
+    unless current_tenant_user&.owner?
+      render json: { error: 'オーナー権限が必要です' }, status: :forbidden
     end
+  end
 
-    def require_tenant_dashboard_access
-      unless current_user&.can_access_tenant_dashboard?
-        render json: { error: 'テナント管理画面へのアクセス権限がありません' }, status: :forbidden
-      end
+  def require_manager_or_above
+    unless current_tenant_user&.can_access_tenant_dashboard?
+      render json: { error: 'マネージャー以上の権限が必要です' }, status: :forbidden
     end
-
-    def require_owner
-      unless current_user&.owner?
-        render json: { error: 'オーナー権限が必要です' }, status: :forbidden
-      end
-    end
+  end
 end

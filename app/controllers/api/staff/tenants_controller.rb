@@ -1,4 +1,4 @@
-class Api::Staff::TenantsController < BaseController
+class Api::Staff::TenantsController < Api::Staff::BaseController
   before_action :set_tenant, only: [:show, :update]
 
   def index
