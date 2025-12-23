@@ -12,7 +12,6 @@ class KitchenQueueSerializer
       cooking_time_minutes: @kitchen_queue.cooking_time_minutes,
       started_at: @kitchen_queue.started_at,
       completed_at: @kitchen_queue.completed_at,
-      notes: @kitchen_queue.notes,
       order: order_json,
       created_at: @kitchen_queue.created_at,
       updated_at: @kitchen_queue.updated_at
