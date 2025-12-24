@@ -11,6 +11,11 @@ class Api::Tenant::ReportsController < Api::Tenant::BaseController
                             .where('created_at >= ? AND created_at < ?', @date.beginning_of_day, @date.end_of_day)
                             .where(status: :paid)
 
+    # アクティブな注文数（未会計）
+    @active_orders = current_tenant.orders
+                                   .where.not(status: :paid)
+                                   .count
+
     render :daily
   end
 
