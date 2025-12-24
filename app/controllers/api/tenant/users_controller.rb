@@ -5,10 +5,12 @@ class Api::Tenant::UsersController < Api::Tenant::BaseController
   def index
     @users = current_tenant.tenant_users
                            .order(created_at: :desc)
-                           .page(params[:page])
+
+    render json: @users.map { |user| serialize_user(user) }
   end
 
   def show
+    render json: serialize_user(@user)
   end
 
   def create
@@ -16,7 +18,7 @@ class Api::Tenant::UsersController < Api::Tenant::BaseController
     @user.password = SecureRandom.hex(16) if @user.password.blank?
 
     if @user.save
-      render :show, status: :created
+      render json: serialize_user(@user), status: :created
     else
       render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
@@ -24,7 +26,7 @@ class Api::Tenant::UsersController < Api::Tenant::BaseController
 
   def update
     if @user.update(user_params)
-      render :show
+      render json: serialize_user(@user)
     else
       render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
@@ -45,5 +47,16 @@ class Api::Tenant::UsersController < Api::Tenant::BaseController
 
   def user_params
     params.require(:user).permit(:name, :email, :password, :role)
+  end
+
+  def serialize_user(user)
+    {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      created_at: user.created_at,
+      updated_at: user.updated_at
+    }
   end
 end
