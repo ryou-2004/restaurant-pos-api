@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_22_131203) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_23_172240) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -24,10 +24,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_22_131203) do
     t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "store_id", null: false
     t.index ["order_id"], name: "index_kitchen_queues_on_order_id"
     t.index ["priority"], name: "index_kitchen_queues_on_priority"
     t.index ["started_at"], name: "index_kitchen_queues_on_started_at"
     t.index ["status"], name: "index_kitchen_queues_on_status"
+    t.index ["store_id", "status"], name: "index_kitchen_queues_on_store_id_and_status"
+    t.index ["store_id"], name: "index_kitchen_queues_on_store_id"
     t.index ["tenant_id", "status"], name: "index_kitchen_queues_on_tenant_id_and_status"
     t.index ["tenant_id"], name: "index_kitchen_queues_on_tenant_id"
   end
@@ -69,8 +72,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_22_131203) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "store_id", null: false
     t.index ["created_at"], name: "index_orders_on_created_at"
     t.index ["status"], name: "index_orders_on_status"
+    t.index ["store_id", "order_number"], name: "index_orders_on_store_id_and_order_number", unique: true
+    t.index ["store_id", "status"], name: "index_orders_on_store_id_and_status"
+    t.index ["store_id"], name: "index_orders_on_store_id"
     t.index ["table_id"], name: "index_orders_on_table_id"
     t.index ["tenant_id", "order_number"], name: "index_orders_on_tenant_id_and_order_number", unique: true
     t.index ["tenant_id"], name: "index_orders_on_tenant_id"
@@ -101,6 +108,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_22_131203) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_staff_users_on_email", unique: true
     t.index ["role"], name: "index_staff_users_on_role"
+  end
+
+  create_table "stores", force: :cascade do |t|
+    t.bigint "tenant_id", null: false
+    t.string "name", null: false
+    t.string "address"
+    t.string "phone"
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_stores_on_active"
+    t.index ["tenant_id", "name"], name: "index_stores_on_tenant_id_and_name", unique: true
+    t.index ["tenant_id"], name: "index_stores_on_tenant_id"
   end
 
   create_table "subscriptions", force: :cascade do |t|
@@ -139,13 +159,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_22_131203) do
   end
 
   add_foreign_key "kitchen_queues", "orders"
+  add_foreign_key "kitchen_queues", "stores"
   add_foreign_key "kitchen_queues", "tenants"
   add_foreign_key "menu_items", "tenants"
   add_foreign_key "order_items", "menu_items"
   add_foreign_key "order_items", "orders"
+  add_foreign_key "orders", "stores"
   add_foreign_key "orders", "tenants"
   add_foreign_key "payments", "orders"
   add_foreign_key "payments", "tenants"
+  add_foreign_key "stores", "tenants"
   add_foreign_key "subscriptions", "tenants"
   add_foreign_key "tenant_users", "tenants"
 end

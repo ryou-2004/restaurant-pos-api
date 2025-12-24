@@ -7,6 +7,8 @@ class Order < ApplicationRecord
   # ========================================
   # 関連付け
   # ========================================
+  belongs_to :store
+  belongs_to :tenant
   has_many :order_items, dependent: :destroy
   has_one :kitchen_queue, dependent: :destroy
   has_one :payment, dependent: :destroy
@@ -29,7 +31,7 @@ class Order < ApplicationRecord
   # バリデーション
   # ========================================
   validates :order_number, presence: true,
-                          uniqueness: { scope: :tenant_id }
+                          uniqueness: { scope: :store_id }
   validates :status, presence: true
   validates :total_amount, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 

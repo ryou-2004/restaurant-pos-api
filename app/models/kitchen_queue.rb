@@ -7,6 +7,8 @@ class KitchenQueue < ApplicationRecord
   # ========================================
   # 関連付け
   # ========================================
+  belongs_to :store
+  belongs_to :tenant
   belongs_to :order
 
   # ========================================
@@ -60,6 +62,7 @@ class KitchenQueue < ApplicationRecord
   # 注文からキューを作成
   def self.create_from_order(order)
     create!(
+      store: order.store,
       tenant: order.tenant,
       order: order,
       status: :waiting,
