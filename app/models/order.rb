@@ -80,7 +80,8 @@ class Order < ApplicationRecord
 
   def generate_order_number
     date_prefix = Time.current.strftime('%Y%m%d')
-    last_number = tenant.orders.where('order_number LIKE ?', "#{date_prefix}%").count
+    # 店舗ごとに注文番号を採番（同じ店舗内で一意）
+    last_number = store.orders.where('order_number LIKE ?', "#{date_prefix}%").count
     self.order_number = "#{date_prefix}-#{(last_number + 1).to_s.rjust(3, '0')}"
   end
 

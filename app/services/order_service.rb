@@ -1,6 +1,10 @@
 class OrderService
-  def initialize(tenant)
+  def initialize(tenant, store = nil)
     @tenant = tenant
+    # store が指定されていない場合は、テナントの最初の店舗を使用
+    @store = store || @tenant.stores.first
+
+    raise ArgumentError, 'テナントに店舗が登録されていません' if @store.nil?
   end
 
   # 注文作成の一連の処理をトランザクションで実行
@@ -36,7 +40,8 @@ class OrderService
   private
 
   def build_order(params)
-    @tenant.orders.create!(
+    @store.orders.create!(
+      tenant: @tenant,
       table_id: params[:table_id],
       notes: params[:notes],
       status: :pending
