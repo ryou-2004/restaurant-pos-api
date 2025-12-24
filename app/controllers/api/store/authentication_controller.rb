@@ -3,8 +3,11 @@ class Api::Store::AuthenticationController < ActionController::API
     @user = TenantUser.find_by(email: params[:email])
 
     if @user&.authenticate(params[:password])
-      @token = JsonWebToken.encode(user_id: @user.id, tenant_id: @user.tenant_id, user_type: 'store')
-      render :login, status: :ok
+      token = JsonWebToken.encode(user_id: @user.id, tenant_id: @user.tenant_id, user_type: 'store')
+      render json: {
+        token: token,
+        user: TenantUserSerializer.new(@user, include_subscription: false, user_type: 'store').as_json
+      }, status: :ok
     else
       render json: { error: 'メールアドレスまたはパスワードが正しくありません' }, status: :unauthorized
     end
@@ -14,7 +17,9 @@ class Api::Store::AuthenticationController < ActionController::API
     @tenant_user = current_tenant_user
 
     if @tenant_user
-      render :me, status: :ok
+      render json: {
+        user: TenantUserSerializer.new(@tenant_user, include_subscription: false, user_type: 'store').as_json
+      }, status: :ok
     else
       render json: { error: 'ユーザーが見つかりません' }, status: :unauthorized
     end

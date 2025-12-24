@@ -3,8 +3,11 @@ class Api::Staff::AuthenticationController < ActionController::API
     @staff_user = StaffUser.find_by(email: params[:email])
 
     if @staff_user&.authenticate(params[:password])
-      @token = JsonWebToken.encode(staff_user_id: @staff_user.id, user_type: 'staff')
-      render :login, status: :ok
+      token = JsonWebToken.encode(staff_user_id: @staff_user.id, user_type: 'staff')
+      render json: {
+        token: token,
+        user: StaffUserSerializer.new(@staff_user).as_json
+      }, status: :ok
     else
       render json: { error: 'メールアドレスまたはパスワードが正しくありません' }, status: :unauthorized
     end
@@ -14,7 +17,9 @@ class Api::Staff::AuthenticationController < ActionController::API
     @staff_user = current_staff_user
 
     if @staff_user
-      render :me, status: :ok
+      render json: {
+        user: StaffUserSerializer.new(@staff_user).as_json
+      }, status: :ok
     else
       render json: { error: 'ユーザーが見つかりません' }, status: :unauthorized
     end
