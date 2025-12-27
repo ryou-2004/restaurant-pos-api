@@ -4,6 +4,7 @@ class Api::Tenant::UsersController < Api::Tenant::BaseController
 
   def index
     @users = current_tenant.tenant_users
+                           .includes(:tags)
                            .order(created_at: :desc)
 
     render json: @users.map { |user| serialize_user(user) }
@@ -46,7 +47,7 @@ class Api::Tenant::UsersController < Api::Tenant::BaseController
   end
 
   def user_params
-    params.require(:user).permit(:name, :email, :password, :role)
+    params.require(:user).permit(:name, :email, :password, :role, tag_ids: [])
   end
 
   def serialize_user(user)
@@ -55,6 +56,7 @@ class Api::Tenant::UsersController < Api::Tenant::BaseController
       name: user.name,
       email: user.email,
       role: user.role,
+      tags: user.tags.map { |tag| { id: tag.id, name: tag.name } },
       created_at: user.created_at,
       updated_at: user.updated_at
     }

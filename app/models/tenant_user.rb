@@ -1,6 +1,8 @@
 class TenantUser < ApplicationRecord
   has_secure_password
   belongs_to :tenant
+  has_many :tenant_user_tags, dependent: :destroy
+  has_many :tags, through: :tenant_user_tags
 
   enum :role, {
     owner: 0,

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_23_172240) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_27_140139) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -137,6 +137,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_23_172240) do
     t.index ["tenant_id"], name: "index_subscriptions_on_tenant_id"
   end
 
+  create_table "tags", force: :cascade do |t|
+    t.bigint "tenant_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tenant_id", "name"], name: "index_tags_on_tenant_id_and_name", unique: true
+    t.index ["tenant_id"], name: "index_tags_on_tenant_id"
+  end
+
+  create_table "tenant_user_tags", force: :cascade do |t|
+    t.bigint "tenant_user_id", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tag_id"], name: "index_tenant_user_tags_on_tag_id"
+    t.index ["tenant_user_id", "tag_id"], name: "index_tenant_user_tags_on_tenant_user_id_and_tag_id", unique: true
+    t.index ["tenant_user_id"], name: "index_tenant_user_tags_on_tenant_user_id"
+  end
+
   create_table "tenant_users", force: :cascade do |t|
     t.bigint "tenant_id", null: false
     t.string "email", null: false
@@ -170,5 +189,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_23_172240) do
   add_foreign_key "payments", "tenants"
   add_foreign_key "stores", "tenants"
   add_foreign_key "subscriptions", "tenants"
+  add_foreign_key "tags", "tenants"
+  add_foreign_key "tenant_user_tags", "tags"
+  add_foreign_key "tenant_user_tags", "tenant_users"
   add_foreign_key "tenant_users", "tenants"
 end

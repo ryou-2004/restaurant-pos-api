@@ -2157,6 +2157,30 @@
                         "type": "boolean",
                         "description": "有効/無効"
                       },
+                      "manager_id": {
+                        "type": "integer",
+                        "nullable": true,
+                        "description": "店長のテナントユーザーID"
+                      },
+                      "manager": {
+                        "type": "object",
+                        "nullable": true,
+                        "description": "店長情報",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          }
+                        }
+                      },
                       "created_at": {
                         "type": "string",
                         "format": "date-time",
@@ -2229,6 +2253,28 @@
                     "active": {
                       "type": "boolean"
                     },
+                    "manager_id": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "manager": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        }
+                      }
+                    },
                     "created_at": {
                       "type": "string",
                       "format": "date-time"
@@ -2295,6 +2341,11 @@
                         "type": "boolean",
                         "description": "有効/無効",
                         "default": true
+                      },
+                      "manager_id": {
+                        "type": "integer",
+                        "description": "店長のテナントユーザーID",
+                        "nullable": true
                       }
                     },
                     "required": [
@@ -2358,6 +2409,28 @@
                     },
                     "active": {
                       "type": "boolean"
+                    },
+                    "manager_id": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "manager": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        }
+                      }
                     },
                     "created_at": {
                       "type": "string",
@@ -2438,6 +2511,28 @@
                     "active": {
                       "type": "boolean"
                     },
+                    "manager_id": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "manager": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        }
+                      }
+                    },
                     "created_at": {
                       "type": "string",
                       "format": "date-time"
@@ -2513,6 +2608,11 @@
                       "active": {
                         "type": "boolean",
                         "description": "有効/無効"
+                      },
+                      "manager_id": {
+                        "type": "integer",
+                        "description": "店長のテナントユーザーID",
+                        "nullable": true
                       }
                     }
                   }
@@ -2542,6 +2642,380 @@
           },
           "404": {
             "description": "店舗が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tenant/tags": {
+      "get": {
+        "summary": "タグ一覧取得",
+        "tags": [
+          "Tenant"
+        ],
+        "description": "テナントに紐づくタグの一覧を取得します。manager以上の権限が必要です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "タグ一覧取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "タグID"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "タグ名"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "作成日時"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "更新日時"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "タグ作成",
+        "tags": [
+          "Tenant"
+        ],
+        "description": "新しいタグを作成します。manager以上の権限が必要です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "タグ作成成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "バリデーションエラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tag": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "タグ名"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  }
+                },
+                "required": [
+                  "tag"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tenant/tags/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "タグID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "タグ詳細取得",
+        "tags": [
+          "Tenant"
+        ],
+        "description": "指定したタグの詳細情報を取得します。manager以上の権限が必要です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "タグ詳細取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "タグが見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "タグ更新",
+        "tags": [
+          "Tenant"
+        ],
+        "description": "指定したタグの情報を更新します。manager以上の権限が必要です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "タグ更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "タグが見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "バリデーションエラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tag": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "タグ名"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "tag"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "タグ削除",
+        "tags": [
+          "Tenant"
+        ],
+        "description": "指定したタグを削除します。manager以上の権限が必要です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "タグ削除成功"
+          },
+          "404": {
+            "description": "タグが見つからない",
             "content": {
               "application/json": {
                 "schema": {
@@ -2607,6 +3081,21 @@
                           "cashier"
                         ],
                         "description": "ロール"
+                      },
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "description": "タグ一覧"
                       },
                       "created_at": {
                         "type": "string",
@@ -2749,6 +3238,13 @@
                           "cashier"
                         ],
                         "description": "ロール"
+                      },
+                      "tag_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        },
+                        "description": "タグIDの配列"
                       }
                     },
                     "required": [

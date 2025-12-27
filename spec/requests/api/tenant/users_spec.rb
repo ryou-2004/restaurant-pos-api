@@ -31,6 +31,17 @@ RSpec.describe 'Api::Tenant::Users', type: :request do
                 enum: ['owner', 'manager', 'staff', 'kitchen_staff', 'cashier'],
                 description: 'ロール'
               },
+              tags: {
+                type: :array,
+                items: {
+                  type: :object,
+                  properties: {
+                    id: { type: :integer },
+                    name: { type: :string }
+                  }
+                },
+                description: 'タグ一覧'
+              },
               created_at: { type: :string, format: 'date-time', description: '作成日時' },
               updated_at: { type: :string, format: 'date-time', description: '更新日時' }
             },
@@ -79,6 +90,11 @@ RSpec.describe 'Api::Tenant::Users', type: :request do
                 type: :string,
                 enum: ['owner', 'manager', 'staff', 'kitchen_staff', 'cashier'],
                 description: 'ロール'
+              },
+              tag_ids: {
+                type: :array,
+                items: { type: :integer },
+                description: 'タグIDの配列'
               }
             },
             required: ['name', 'email', 'role']
