@@ -72,15 +72,4 @@ RSpec.configure do |config|
 
   # FactoryBot設定
   config.include FactoryBot::Syntax::Methods
-
-  # APIリクエストヘルパー
-  config.include ActionController::RespondWith, type: :request
-end
-
-# Shoulda Matchers設定
-Shoulda::Matchers.configure do |config|
-  config.integrate do |with|
-    with.test_framework :rspec
-    with.library :rails
-  end
 end
