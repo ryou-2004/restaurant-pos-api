@@ -1096,6 +1096,155 @@
         }
       }
     },
+    "/api/store/menu_items": {
+      "get": {
+        "summary": "メニュー一覧取得",
+        "tags": [
+          "Store"
+        ],
+        "description": "利用可能なメニュー項目の一覧を取得します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "メニュー一覧取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "メニューID"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "メニュー名"
+                      },
+                      "price": {
+                        "type": "integer",
+                        "description": "価格"
+                      },
+                      "category": {
+                        "type": "string",
+                        "description": "カテゴリー"
+                      },
+                      "available": {
+                        "type": "boolean",
+                        "description": "利用可能"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "price",
+                      "category",
+                      "available"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/store/menu_items/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "メニューID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "メニュー詳細取得",
+        "tags": [
+          "Store"
+        ],
+        "description": "指定したメニュー項目の詳細情報を取得します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "メニュー詳細取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "price": {
+                      "type": "integer"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "available": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "price",
+                    "category",
+                    "available"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "メニューが見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/store/orders": {
       "get": {
         "summary": "注文一覧取得",
