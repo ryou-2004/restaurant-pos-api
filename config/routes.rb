@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       resources :users
       resources :stores
       resources :tags
+      resources :tables
 
       resources :reports, only: [:index] do
         collection do
