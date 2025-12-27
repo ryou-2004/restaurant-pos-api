@@ -1681,6 +1681,159 @@
         }
       }
     },
+    "/api/store/tables": {
+      "get": {
+        "summary": "テーブル一覧取得",
+        "tags": [
+          "Store"
+        ],
+        "description": "店舗のテーブル一覧を取得します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "テーブル一覧取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "テーブルID"
+                      },
+                      "number": {
+                        "type": "string",
+                        "description": "テーブル番号"
+                      },
+                      "capacity": {
+                        "type": "integer",
+                        "description": "収容人数"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "available",
+                          "occupied",
+                          "reserved",
+                          "cleaning"
+                        ],
+                        "description": "ステータス"
+                      },
+                      "qr_code": {
+                        "type": "string",
+                        "description": "QRコード"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "number",
+                      "capacity",
+                      "status"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/store/tables/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "テーブルID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "テーブル詳細取得",
+        "tags": [
+          "Store"
+        ],
+        "description": "指定したテーブルの詳細情報を取得します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "テーブル詳細取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "number": {
+                      "type": "string"
+                    },
+                    "capacity": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "qr_code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "number",
+                    "capacity",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "テーブルが見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/tenant/menu_items": {
       "get": {
         "summary": "メニュー一覧取得",

@@ -64,6 +64,7 @@ Rails.application.routes.draw do
       end
 
       resources :menu_items, only: [:index, :show]
+      resources :tables, only: [:index, :show]
     end
   end
 end
