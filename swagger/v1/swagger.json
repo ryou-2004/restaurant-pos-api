@@ -2157,30 +2157,6 @@
                         "type": "boolean",
                         "description": "有効/無効"
                       },
-                      "manager_id": {
-                        "type": "integer",
-                        "nullable": true,
-                        "description": "店長のテナントユーザーID"
-                      },
-                      "manager": {
-                        "type": "object",
-                        "nullable": true,
-                        "description": "店長情報",
-                        "properties": {
-                          "id": {
-                            "type": "integer"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "email": {
-                            "type": "string"
-                          },
-                          "role": {
-                            "type": "string"
-                          }
-                        }
-                      },
                       "created_at": {
                         "type": "string",
                         "format": "date-time",
@@ -2253,28 +2229,6 @@
                     "active": {
                       "type": "boolean"
                     },
-                    "manager_id": {
-                      "type": "integer",
-                      "nullable": true
-                    },
-                    "manager": {
-                      "type": "object",
-                      "nullable": true,
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "email": {
-                          "type": "string"
-                        },
-                        "role": {
-                          "type": "string"
-                        }
-                      }
-                    },
                     "created_at": {
                       "type": "string",
                       "format": "date-time"
@@ -2341,11 +2295,6 @@
                         "type": "boolean",
                         "description": "有効/無効",
                         "default": true
-                      },
-                      "manager_id": {
-                        "type": "integer",
-                        "description": "店長のテナントユーザーID",
-                        "nullable": true
                       }
                     },
                     "required": [
@@ -2409,28 +2358,6 @@
                     },
                     "active": {
                       "type": "boolean"
-                    },
-                    "manager_id": {
-                      "type": "integer",
-                      "nullable": true
-                    },
-                    "manager": {
-                      "type": "object",
-                      "nullable": true,
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "email": {
-                          "type": "string"
-                        },
-                        "role": {
-                          "type": "string"
-                        }
-                      }
                     },
                     "created_at": {
                       "type": "string",
@@ -2511,28 +2438,6 @@
                     "active": {
                       "type": "boolean"
                     },
-                    "manager_id": {
-                      "type": "integer",
-                      "nullable": true
-                    },
-                    "manager": {
-                      "type": "object",
-                      "nullable": true,
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "email": {
-                          "type": "string"
-                        },
-                        "role": {
-                          "type": "string"
-                        }
-                      }
-                    },
                     "created_at": {
                       "type": "string",
                       "format": "date-time"
@@ -2608,11 +2513,6 @@
                       "active": {
                         "type": "boolean",
                         "description": "有効/無効"
-                      },
-                      "manager_id": {
-                        "type": "integer",
-                        "description": "店長のテナントユーザーID",
-                        "nullable": true
                       }
                     }
                   }
@@ -2642,6 +2542,500 @@
           },
           "404": {
             "description": "店舗が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tenant/tables": {
+      "get": {
+        "summary": "テーブル一覧取得",
+        "tags": [
+          "Tenant"
+        ],
+        "description": "テナントに紐づくテーブルの一覧を取得します。manager以上の権限が必要です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "テーブル一覧取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "テーブルID"
+                      },
+                      "store_id": {
+                        "type": "integer",
+                        "description": "店舗ID"
+                      },
+                      "store_name": {
+                        "type": "string",
+                        "description": "店舗名"
+                      },
+                      "number": {
+                        "type": "string",
+                        "description": "テーブル番号"
+                      },
+                      "capacity": {
+                        "type": "integer",
+                        "description": "収容人数"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "available",
+                          "occupied",
+                          "reserved",
+                          "cleaning"
+                        ],
+                        "description": "ステータス"
+                      },
+                      "qr_code": {
+                        "type": "string",
+                        "description": "QRコード"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "作成日時"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "更新日時"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "store_id",
+                      "store_name",
+                      "number",
+                      "capacity",
+                      "status",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "テーブル作成",
+        "tags": [
+          "Tenant"
+        ],
+        "description": "新しいテーブルを作成します。manager以上の権限が必要です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "テーブル作成成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "store_id": {
+                      "type": "integer"
+                    },
+                    "store_name": {
+                      "type": "string"
+                    },
+                    "number": {
+                      "type": "string"
+                    },
+                    "capacity": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "qr_code": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "store_id",
+                    "store_name",
+                    "number",
+                    "capacity",
+                    "status",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "バリデーションエラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "table": {
+                    "type": "object",
+                    "properties": {
+                      "store_id": {
+                        "type": "integer",
+                        "description": "店舗ID"
+                      },
+                      "number": {
+                        "type": "string",
+                        "description": "テーブル番号"
+                      },
+                      "capacity": {
+                        "type": "integer",
+                        "description": "収容人数"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "available",
+                          "occupied",
+                          "reserved",
+                          "cleaning"
+                        ],
+                        "description": "ステータス"
+                      }
+                    },
+                    "required": [
+                      "store_id",
+                      "number"
+                    ]
+                  }
+                },
+                "required": [
+                  "table"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tenant/tables/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "テーブルID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "テーブル詳細取得",
+        "tags": [
+          "Tenant"
+        ],
+        "description": "指定したテーブルの詳細情報を取得します。manager以上の権限が必要です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "テーブル詳細取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "store_id": {
+                      "type": "integer"
+                    },
+                    "store_name": {
+                      "type": "string"
+                    },
+                    "number": {
+                      "type": "string"
+                    },
+                    "capacity": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "qr_code": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "store_id",
+                    "store_name",
+                    "number",
+                    "capacity",
+                    "status",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "テーブルが見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "テーブル更新",
+        "tags": [
+          "Tenant"
+        ],
+        "description": "指定したテーブルの情報を更新します。manager以上の権限が必要です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "テーブル更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "store_id": {
+                      "type": "integer"
+                    },
+                    "store_name": {
+                      "type": "string"
+                    },
+                    "number": {
+                      "type": "string"
+                    },
+                    "capacity": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "qr_code": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "store_id",
+                    "store_name",
+                    "number",
+                    "capacity",
+                    "status",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "テーブルが見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "バリデーションエラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "table": {
+                    "type": "object",
+                    "properties": {
+                      "number": {
+                        "type": "string",
+                        "description": "テーブル番号"
+                      },
+                      "capacity": {
+                        "type": "integer",
+                        "description": "収容人数"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "available",
+                          "occupied",
+                          "reserved",
+                          "cleaning"
+                        ],
+                        "description": "ステータス"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "table"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "テーブル削除",
+        "tags": [
+          "Tenant"
+        ],
+        "description": "指定したテーブルを削除します。manager以上の権限が必要です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "テーブル削除成功"
+          },
+          "404": {
+            "description": "テーブルが見つからない",
             "content": {
               "application/json": {
                 "schema": {
