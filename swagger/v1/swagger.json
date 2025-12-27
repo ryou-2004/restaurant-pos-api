@@ -70,6 +70,837 @@
     }
   ],
   "paths": {
+    "/api/store/kitchen_queues": {
+      "get": {
+        "summary": "厨房キュー一覧取得",
+        "tags": [
+          "Store"
+        ],
+        "description": "厨房の調理キュー一覧を取得します。アクティブなキューのみを優先度順に返します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "キュー一覧取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "order_id": {
+                        "type": "integer"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "waiting",
+                          "in_progress",
+                          "completed"
+                        ]
+                      },
+                      "priority": {
+                        "type": "integer"
+                      },
+                      "notes": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "order": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "order_number": {
+                            "type": "string"
+                          },
+                          "order_items": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer"
+                                },
+                                "menu_item_name": {
+                                  "type": "string"
+                                },
+                                "quantity": {
+                                  "type": "integer"
+                                },
+                                "notes": {
+                                  "type": "string",
+                                  "nullable": true
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "order_id",
+                      "status",
+                      "priority",
+                      "order",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/store/kitchen_queues/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "キューID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "キュー詳細取得",
+        "tags": [
+          "Store"
+        ],
+        "description": "指定したキューの詳細情報を取得します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "キュー詳細取得成功"
+          },
+          "404": {
+            "description": "キューが見つからない"
+          }
+        }
+      },
+      "patch": {
+        "summary": "キュー更新",
+        "tags": [
+          "Store"
+        ],
+        "description": "キューの情報（優先度、メモ）を更新します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "キュー更新成功"
+          },
+          "404": {
+            "description": "キューが見つからない"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "kitchen_queue": {
+                    "type": "object",
+                    "properties": {
+                      "priority": {
+                        "type": "integer"
+                      },
+                      "notes": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "kitchen_queue"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/store/kitchen_queues/{id}/start": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "キューID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "patch": {
+        "summary": "調理開始",
+        "tags": [
+          "Store"
+        ],
+        "description": "キューの調理を開始します。ステータスをwaiting→in_progressに変更します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "調理開始成功"
+          },
+          "422": {
+            "description": "調理開始できない状態"
+          }
+        }
+      }
+    },
+    "/api/store/kitchen_queues/{id}/complete": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "キューID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "patch": {
+        "summary": "調理完了",
+        "tags": [
+          "Store"
+        ],
+        "description": "キューの調理を完了します。ステータスをin_progress→completedに変更します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "調理完了成功"
+          },
+          "422": {
+            "description": "完了できない状態"
+          }
+        }
+      }
+    },
+    "/api/store/orders": {
+      "get": {
+        "summary": "注文一覧取得",
+        "tags": [
+          "Store"
+        ],
+        "description": "店舗の注文一覧を取得します。statusパラメータでフィルタリング可能です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "注文ステータスフィルター (pending, cooking, ready, delivered, paid)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "注文一覧取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "order_number": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "pending",
+                          "cooking",
+                          "ready",
+                          "delivered",
+                          "paid"
+                        ]
+                      },
+                      "table_id": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "total_amount": {
+                        "type": "integer"
+                      },
+                      "notes": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "order_items": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "menu_item_id": {
+                              "type": "integer"
+                            },
+                            "menu_item_name": {
+                              "type": "string"
+                            },
+                            "quantity": {
+                              "type": "integer"
+                            },
+                            "unit_price": {
+                              "type": "integer"
+                            },
+                            "subtotal": {
+                              "type": "integer"
+                            },
+                            "notes": {
+                              "type": "string",
+                              "nullable": true
+                            }
+                          }
+                        }
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "order_number",
+                      "status",
+                      "total_amount",
+                      "order_items",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "注文作成",
+        "tags": [
+          "Store"
+        ],
+        "description": "新しい注文を作成します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "注文作成成功"
+          },
+          "422": {
+            "description": "バリデーションエラー"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order": {
+                    "type": "object",
+                    "properties": {
+                      "table_id": {
+                        "type": "integer"
+                      },
+                      "notes": {
+                        "type": "string"
+                      },
+                      "order_items_attributes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "menu_item_id": {
+                              "type": "integer"
+                            },
+                            "quantity": {
+                              "type": "integer"
+                            },
+                            "notes": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "menu_item_id",
+                            "quantity"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "order_items_attributes"
+                    ]
+                  }
+                },
+                "required": [
+                  "order"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/store/orders/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "注文ID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "注文詳細取得",
+        "tags": [
+          "Store"
+        ],
+        "description": "指定した注文の詳細情報を取得します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "注文詳細取得成功"
+          },
+          "404": {
+            "description": "注文が見つからない"
+          }
+        }
+      },
+      "patch": {
+        "summary": "注文更新",
+        "tags": [
+          "Store"
+        ],
+        "description": "指定した注文の情報を更新します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "注文更新成功"
+          },
+          "404": {
+            "description": "注文が見つからない"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order": {
+                    "type": "object",
+                    "properties": {
+                      "table_id": {
+                        "type": "integer"
+                      },
+                      "notes": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "order"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/store/orders/{id}/start_cooking": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "注文ID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "patch": {
+        "summary": "調理開始",
+        "tags": [
+          "Store"
+        ],
+        "description": "注文の調理を開始します。ステータスをpending→cookingに変更します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "調理開始成功"
+          },
+          "422": {
+            "description": "調理開始できない状態"
+          }
+        }
+      }
+    },
+    "/api/store/orders/{id}/mark_as_ready": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "注文ID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "patch": {
+        "summary": "調理完了",
+        "tags": [
+          "Store"
+        ],
+        "description": "注文の調理を完了します。ステータスをcooking→readyに変更します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "調理完了成功"
+          },
+          "422": {
+            "description": "調理完了にできない状態"
+          }
+        }
+      }
+    },
+    "/api/store/orders/{id}/deliver": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "注文ID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "patch": {
+        "summary": "配膳完了",
+        "tags": [
+          "Store"
+        ],
+        "description": "注文の配膳を完了します。ステータスをready→deliveredに変更します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "配膳完了成功"
+          },
+          "422": {
+            "description": "配膳できない状態"
+          }
+        }
+      }
+    },
+    "/api/store/payments": {
+      "get": {
+        "summary": "支払い一覧取得",
+        "tags": [
+          "Store"
+        ],
+        "description": "店舗の支払い一覧を取得します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "支払い一覧取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "order_id": {
+                        "type": "integer"
+                      },
+                      "payment_method": {
+                        "type": "string",
+                        "enum": [
+                          "cash",
+                          "credit_card",
+                          "qr_code",
+                          "other"
+                        ]
+                      },
+                      "amount": {
+                        "type": "integer"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "pending",
+                          "completed",
+                          "failed"
+                        ]
+                      },
+                      "notes": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "order": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "order_number": {
+                            "type": "string"
+                          },
+                          "total_amount": {
+                            "type": "integer"
+                          }
+                        }
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "order_id",
+                      "payment_method",
+                      "amount",
+                      "status",
+                      "order",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "支払い作成",
+        "tags": [
+          "Store"
+        ],
+        "description": "注文に対する支払いを作成します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "支払い作成成功"
+          },
+          "422": {
+            "description": "会計できない状態"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "payment": {
+                    "type": "object",
+                    "properties": {
+                      "order_id": {
+                        "type": "integer",
+                        "description": "注文ID"
+                      },
+                      "payment_method": {
+                        "type": "string",
+                        "enum": [
+                          "cash",
+                          "credit_card",
+                          "qr_code",
+                          "other"
+                        ],
+                        "description": "支払い方法"
+                      },
+                      "notes": {
+                        "type": "string",
+                        "description": "メモ"
+                      }
+                    },
+                    "required": [
+                      "order_id",
+                      "payment_method"
+                    ]
+                  }
+                },
+                "required": [
+                  "payment"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/store/payments/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "支払いID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "支払い詳細取得",
+        "tags": [
+          "Store"
+        ],
+        "description": "指定した支払いの詳細情報を取得します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "支払い詳細取得成功"
+          },
+          "404": {
+            "description": "支払いが見つからない"
+          }
+        }
+      }
+    },
+    "/api/store/payments/{id}/complete": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "支払いID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "patch": {
+        "summary": "支払い完了",
+        "tags": [
+          "Store"
+        ],
+        "description": "支払いを完了します。ステータスをpending→completedに変更し、注文ステータスをpaidに変更します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "支払い完了成功"
+          },
+          "422": {
+            "description": "完了できない状態"
+          }
+        }
+      }
+    },
     "/api/tenant/menu_items": {
       "get": {
         "summary": "メニュー一覧取得",
