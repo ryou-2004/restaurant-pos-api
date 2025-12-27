@@ -70,6 +70,786 @@
     }
   ],
   "paths": {
+    "/api/staff/auth/login": {
+      "post": {
+        "summary": "スタッフログイン",
+        "tags": [
+          "Staff"
+        ],
+        "description": "スタッフユーザーの認証を行います。",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "ログイン成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "JWTトークン"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "user"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "メールアドレス"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "パスワード"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/staff/auth/me": {
+      "get": {
+        "summary": "現在のスタッフユーザー情報取得",
+        "tags": [
+          "Staff"
+        ],
+        "description": "認証中のスタッフユーザー情報を取得します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ユーザー情報取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "user"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/staff/auth/logout": {
+      "post": {
+        "summary": "スタッフログアウト",
+        "tags": [
+          "Staff"
+        ],
+        "description": "スタッフユーザーのログアウトを行います。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ログアウト成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/staff/subscriptions": {
+      "get": {
+        "summary": "サブスクリプション一覧取得",
+        "tags": [
+          "Staff"
+        ],
+        "description": "サブスクリプションの一覧を取得します。スタッフ専用機能です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "ページ番号",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "サブスクリプション一覧取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "tenant_id": {
+                        "type": "integer"
+                      },
+                      "plan": {
+                        "type": "string",
+                        "enum": [
+                          "basic",
+                          "standard",
+                          "enterprise"
+                        ],
+                        "description": "プラン種別"
+                      },
+                      "max_stores": {
+                        "type": "integer",
+                        "description": "最大店舗数"
+                      },
+                      "realtime_enabled": {
+                        "type": "boolean",
+                        "description": "リアルタイム機能有効"
+                      },
+                      "polling_enabled": {
+                        "type": "boolean",
+                        "description": "ポーリング機能有効"
+                      },
+                      "expires_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "有効期限"
+                      },
+                      "tenant": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "subdomain": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "tenant_id",
+                      "plan",
+                      "max_stores",
+                      "realtime_enabled",
+                      "polling_enabled",
+                      "expires_at",
+                      "tenant",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー"
+          }
+        }
+      }
+    },
+    "/api/staff/subscriptions/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "サブスクリプションID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "サブスクリプション詳細取得",
+        "tags": [
+          "Staff"
+        ],
+        "description": "指定したサブスクリプションの詳細情報を取得します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "サブスクリプション詳細取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "tenant_id": {
+                      "type": "integer"
+                    },
+                    "plan": {
+                      "type": "string"
+                    },
+                    "max_stores": {
+                      "type": "integer"
+                    },
+                    "realtime_enabled": {
+                      "type": "boolean"
+                    },
+                    "polling_enabled": {
+                      "type": "boolean"
+                    },
+                    "expires_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "tenant": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "subdomain": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "tenant_id",
+                    "plan",
+                    "max_stores",
+                    "realtime_enabled",
+                    "polling_enabled",
+                    "expires_at",
+                    "tenant",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "サブスクリプションが見つからない"
+          }
+        }
+      },
+      "patch": {
+        "summary": "サブスクリプション更新",
+        "tags": [
+          "Staff"
+        ],
+        "description": "サブスクリプション情報を更新します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "サブスクリプション更新成功"
+          },
+          "404": {
+            "description": "サブスクリプションが見つからない"
+          },
+          "422": {
+            "description": "バリデーションエラー"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subscription": {
+                    "type": "object",
+                    "properties": {
+                      "plan": {
+                        "type": "string",
+                        "enum": [
+                          "basic",
+                          "standard",
+                          "enterprise"
+                        ],
+                        "description": "プラン種別"
+                      },
+                      "max_stores": {
+                        "type": "integer",
+                        "description": "最大店舗数"
+                      },
+                      "realtime_enabled": {
+                        "type": "boolean",
+                        "description": "リアルタイム機能有効"
+                      },
+                      "polling_enabled": {
+                        "type": "boolean",
+                        "description": "ポーリング機能有効"
+                      },
+                      "expires_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "有効期限"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "subscription"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/staff/tenants": {
+      "get": {
+        "summary": "テナント一覧取得",
+        "tags": [
+          "Staff"
+        ],
+        "description": "テナントの一覧を取得します。スタッフ専用機能です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "ページ番号",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "テナント一覧取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "subdomain": {
+                        "type": "string"
+                      },
+                      "subscription": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "plan": {
+                            "type": "string",
+                            "enum": [
+                              "basic",
+                              "standard",
+                              "enterprise"
+                            ]
+                          },
+                          "max_stores": {
+                            "type": "integer"
+                          },
+                          "realtime_enabled": {
+                            "type": "boolean"
+                          },
+                          "polling_enabled": {
+                            "type": "boolean"
+                          },
+                          "expires_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      },
+                      "users_count": {
+                        "type": "integer"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "subdomain",
+                      "subscription",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー"
+          }
+        }
+      },
+      "post": {
+        "summary": "テナント作成",
+        "tags": [
+          "Staff"
+        ],
+        "description": "新しいテナントを作成します。スタッフ専用機能です。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "テナント作成成功"
+          },
+          "422": {
+            "description": "バリデーションエラー"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tenant": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "テナント名"
+                      },
+                      "subdomain": {
+                        "type": "string",
+                        "description": "サブドメイン"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "subdomain"
+                    ]
+                  }
+                },
+                "required": [
+                  "tenant"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/staff/tenants/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "テナントID",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "テナント詳細取得",
+        "tags": [
+          "Staff"
+        ],
+        "description": "指定したテナントの詳細情報を取得します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "テナント詳細取得成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "subdomain": {
+                      "type": "string"
+                    },
+                    "subscription": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "plan": {
+                          "type": "string"
+                        },
+                        "max_stores": {
+                          "type": "integer"
+                        },
+                        "realtime_enabled": {
+                          "type": "boolean"
+                        },
+                        "polling_enabled": {
+                          "type": "boolean"
+                        },
+                        "expires_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "subdomain",
+                    "subscription",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "テナントが見つからない"
+          }
+        }
+      },
+      "patch": {
+        "summary": "テナント更新",
+        "tags": [
+          "Staff"
+        ],
+        "description": "テナント情報を更新します。",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "テナント更新成功"
+          },
+          "404": {
+            "description": "テナントが見つからない"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tenant": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "subdomain": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "tenant"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/store/kitchen_queues": {
       "get": {
         "summary": "厨房キュー一覧取得",
