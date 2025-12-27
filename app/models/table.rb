@@ -8,7 +8,7 @@ class Table < ApplicationRecord
   # ========================================
   # Enum定義
   # ========================================
-  enum status: {
+  enum :status, {
     available: 0,  # 空席
     occupied: 1,   # 使用中
     reserved: 2,   # 予約済み
