@@ -42,6 +42,5 @@ class Api::Customer::BaseController < ActionController::API
 
     # Set global context
     Current.tenant = @current_tenant
-    Current.table = @current_table
   end
 end
