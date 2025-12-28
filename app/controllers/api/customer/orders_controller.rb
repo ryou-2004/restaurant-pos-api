@@ -4,7 +4,7 @@ class Api::Customer::OrdersController < Api::Customer::BaseController
     @orders = current_tenant.orders
                           .where(table_id: current_table.id)
                           .where.not(status: :paid)
-                          .includes(:order_items)
+                          .includes(order_items: :menu_item)
                           .order(created_at: :desc)
 
     render json: @orders.map { |order| serialize_order(order) }
