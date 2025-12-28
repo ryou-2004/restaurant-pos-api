@@ -18,17 +18,8 @@ class Api::Customer::AuthenticationController < ActionController::API
       return
     end
 
-    # テーブルのステータスを確認（available または reserved のみ許可）
-    unless table.available? || table.reserved?
-      render json: { 
-        error: 'このテーブルは現在使用できません',
-        table_status: table.status
-      }, status: :forbidden
-      return
-    end
-
-    # テーブルを占有状態に変更
-    table.update(status: :occupied) if table.available?
+    # 複数人が同じテーブルで何度でもログインできるように
+    # ステータスチェックと変更を削除
 
     # JWT トークン生成
     token_payload = {
