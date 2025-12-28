@@ -70,6 +70,9 @@ Rails.application.routes.draw do
     namespace :customer do
       post 'auth/login_via_qr', to: 'authentication#login_via_qr'
       post 'auth/logout', to: 'authentication#logout'
+
+      resources :menu_items, only: [:index]
+      resources :orders, only: [:index, :create]
     end
   end
 end
