@@ -66,5 +66,10 @@ Rails.application.routes.draw do
       resources :menu_items, only: [:index, :show]
       resources :tables, only: [:index, :show]
     end
+
+    namespace :customer do
+      post 'auth/login_via_qr', to: 'authentication#login_via_qr'
+      post 'auth/logout', to: 'authentication#logout'
+    end
   end
 end
