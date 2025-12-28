@@ -1,9 +1,9 @@
 class Api::Customer::MenuItemsController < Api::Customer::BaseController
   def index
-    # 現在のテナントの利用可能なメニュー項目のみを返す
+    # 現在のテナントの利用可能なメニュー項目のみを返す（カテゴリー順でソート）
     @menu_items = current_tenant.menu_items
                                 .where(available: true)
-                                .order(:category, :name)
+                                .ordered_by_category
 
     render json: @menu_items.map { |item| serialize_menu_item(item) }
   end
@@ -16,6 +16,7 @@ class Api::Customer::MenuItemsController < Api::Customer::BaseController
       name: item.name,
       price: item.price,
       category: item.category,
+      category_order: item.category_order,
       description: item.description,
       available: item.available,
       created_at: item.created_at,

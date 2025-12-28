@@ -16,12 +16,15 @@ class MenuItem < ApplicationRecord
   validates :price, presence: true,
                     numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :category, presence: true
+  validates :category_order, presence: true,
+                             numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   # ========================================
   # スコープ
   # ========================================
   scope :available, -> { where(available: true) }
   scope :by_category, ->(category) { where(category: category) }
+  scope :ordered_by_category, -> { order(:category_order, :category, :name) }
 
   # ========================================
   # パブリックメソッド
