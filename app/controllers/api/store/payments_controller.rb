@@ -11,7 +11,7 @@ class Api::Store::PaymentsController < Api::Store::BaseController
   # GET /api/store/payments
   def index
     @payments = current_tenant.payments
-                              .includes(order: :order_items)
+                              .includes(table_session: { orders: :order_items })
                               .order(created_at: :desc)
 
     render json: @payments.map { |payment| PaymentSerializer.new(payment).as_json }
@@ -24,16 +24,19 @@ class Api::Store::PaymentsController < Api::Store::BaseController
 
   # POST /api/store/payments
   def create
-    @order = current_tenant.orders.find(payment_params[:order_id])
+    @table_session = current_tenant.table_sessions.find(payment_params[:table_session_id])
 
-    unless @order.can_pay?
-      return render json: { error: '会計できない状態です' }, status: :unprocessable_entity
+    unless @table_session.active?
+      return render json: { error: '会計できない状態です（セッションが終了しています）' }, status: :unprocessable_entity
     end
 
+    # テーブルセッションの合計金額を計算
+    total = @table_session.total_amount
+
     @payment = current_tenant.payments.new(
-      order: @order,
+      table_session: @table_session,
       payment_method: payment_params[:payment_method],
-      amount: @order.total_amount,
+      amount: total,
       status: :pending
     )
 
@@ -74,6 +77,6 @@ class Api::Store::PaymentsController < Api::Store::BaseController
   end
 
   def payment_params
-    params.require(:payment).permit(:order_id, :payment_method, :notes)
+    params.require(:payment).permit(:table_session_id, :payment_method, :notes)
   end
 end

@@ -11,7 +11,7 @@ class PaymentSerializer
       status: @payment.status,
       paid_at: @payment.paid_at,
       notes: @payment.notes,
-      order: order_json,
+      table_session: table_session_json,
       created_at: @payment.created_at,
       updated_at: @payment.updated_at
     }
@@ -19,15 +19,17 @@ class PaymentSerializer
 
   private
 
-  def order_json
-    return nil unless @payment.order
+  def table_session_json
+    return nil unless @payment.table_session
 
     {
-      id: @payment.order.id,
-      order_number: @payment.order.order_number,
-      table_id: @payment.order.table_id,
-      total_amount: @payment.order.total_amount,
-      status: @payment.order.status
+      id: @payment.table_session.id,
+      table_id: @payment.table_session.table_id,
+      party_size: @payment.table_session.party_size,
+      order_count: @payment.table_session.order_count,
+      total_amount: @payment.table_session.total_amount,
+      duration_minutes: @payment.table_session.duration_in_minutes,
+      status: @payment.table_session.status
     }
   end
 end
