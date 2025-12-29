@@ -21,9 +21,16 @@ class Api::Customer::AuthenticationController < ActionController::API
     # 複数人が同じテーブルで何度でもログインできるように
     # ステータスチェックと変更を削除
 
+    # アクティブなテーブルセッションを検索または作成
+    table_session = TableSession.find_or_create_active_session(
+      store_id: table.store_id,
+      table_id: table.id
+    )
+
     # JWT トークン生成
     token_payload = {
       table_id: table.id,
+      table_session_id: table_session.id,
       tenant_id: table.tenant_id,
       store_id: table.store_id,
       user_type: 'customer',
@@ -38,6 +45,7 @@ class Api::Customer::AuthenticationController < ActionController::API
       session: {
         table_id: table.id,
         table_number: table.number,
+        table_session_id: table_session.id,
         store_id: table.store_id,
         store_name: table.store.name,
         tenant_id: table.tenant_id,

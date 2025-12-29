@@ -43,6 +43,7 @@ class OrderService
     @store.orders.create!(
       tenant: @tenant,
       table_id: params[:table_id],
+      table_session_id: params[:table_session_id],
       notes: params[:notes],
       status: :pending
     )

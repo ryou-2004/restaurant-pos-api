@@ -1,23 +1,22 @@
 class Api::Customer::OrdersController < Api::Customer::BaseController
   def index
-    # 自分のテーブルの未払い注文のみを返す
-    @orders = current_tenant.orders
-                          .where(table_id: current_table.id)
-                          .where.not(status: :paid)
-                          .includes(order_items: :menu_item)
-                          .order(created_at: :desc)
+    # 自分のテーブルセッションの注文を返す（会計前のアクティブなセッション）
+    @orders = current_table_session.orders
+                                   .includes(order_items: :menu_item)
+                                   .order(created_at: :desc)
 
     render json: @orders.map { |order| serialize_order(order) }
   end
 
   def create
-    # 注文データを作成（table_idは自動設定）
-    order_params_with_table = order_params.merge(
-      table_id: current_table.id
+    # 注文データを作成（table_idとtable_session_idは自動設定）
+    order_params_with_context = order_params.merge(
+      table_id: current_table.id,
+      table_session_id: current_table_session.id
     )
 
     # OrderServiceを使用して注文作成
-    @order = OrderService.new(current_tenant).create_order(order_params_with_table)
+    @order = OrderService.new(current_tenant).create_order(order_params_with_context)
 
     if @order.persisted?
       render json: serialize_order(@order), status: :created
