@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_28_155734) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_29_093346) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,28 +75,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_28_155734) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "store_id", null: false
+    t.bigint "table_session_id"
     t.index ["created_at"], name: "index_orders_on_created_at"
     t.index ["status"], name: "index_orders_on_status"
     t.index ["store_id", "order_number"], name: "index_orders_on_store_id_and_order_number", unique: true
     t.index ["store_id", "status"], name: "index_orders_on_store_id_and_status"
     t.index ["store_id"], name: "index_orders_on_store_id"
     t.index ["table_id"], name: "index_orders_on_table_id"
+    t.index ["table_session_id"], name: "index_orders_on_table_session_id"
     t.index ["tenant_id", "order_number"], name: "index_orders_on_tenant_id_and_order_number", unique: true
     t.index ["tenant_id"], name: "index_orders_on_tenant_id"
   end
 
   create_table "payments", force: :cascade do |t|
     t.bigint "tenant_id", null: false
-    t.bigint "order_id", null: false
     t.integer "payment_method", null: false
     t.integer "amount", null: false
     t.integer "status", default: 0, null: false
     t.datetime "paid_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["order_id"], name: "index_payments_on_order_id"
+    t.bigint "table_session_id"
     t.index ["payment_method"], name: "index_payments_on_payment_method"
     t.index ["status"], name: "index_payments_on_status"
+    t.index ["table_session_id"], name: "index_payments_on_table_session_id"
     t.index ["tenant_id", "created_at"], name: "index_payments_on_tenant_id_and_created_at"
     t.index ["tenant_id"], name: "index_payments_on_tenant_id"
   end
@@ -137,6 +139,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_28_155734) do
     t.index ["expires_at"], name: "index_subscriptions_on_expires_at"
     t.index ["plan"], name: "index_subscriptions_on_plan"
     t.index ["tenant_id"], name: "index_subscriptions_on_tenant_id"
+  end
+
+  create_table "table_sessions", force: :cascade do |t|
+    t.bigint "tenant_id", null: false
+    t.bigint "store_id", null: false
+    t.integer "table_id", null: false
+    t.integer "party_size"
+    t.integer "status", default: 0, null: false
+    t.datetime "started_at", null: false
+    t.datetime "ended_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["started_at"], name: "index_table_sessions_on_started_at"
+    t.index ["status"], name: "index_table_sessions_on_status"
+    t.index ["store_id", "table_id", "status"], name: "index_table_sessions_on_store_table_status"
+    t.index ["store_id"], name: "index_table_sessions_on_store_id"
+    t.index ["table_id"], name: "index_table_sessions_on_table_id"
+    t.index ["tenant_id"], name: "index_table_sessions_on_tenant_id"
   end
 
   create_table "tables", force: :cascade do |t|
@@ -201,11 +221,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_28_155734) do
   add_foreign_key "order_items", "menu_items"
   add_foreign_key "order_items", "orders"
   add_foreign_key "orders", "stores"
+  add_foreign_key "orders", "table_sessions"
   add_foreign_key "orders", "tenants"
-  add_foreign_key "payments", "orders"
+  add_foreign_key "payments", "table_sessions"
   add_foreign_key "payments", "tenants"
   add_foreign_key "stores", "tenants"
   add_foreign_key "subscriptions", "tenants"
+  add_foreign_key "table_sessions", "stores"
+  add_foreign_key "table_sessions", "tenants"
   add_foreign_key "tables", "stores"
   add_foreign_key "tables", "tenants"
   add_foreign_key "tags", "tenants"
