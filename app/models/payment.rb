@@ -7,7 +7,7 @@ class Payment < ApplicationRecord
   # ========================================
   # 関連付け
   # ========================================
-  belongs_to :order
+  belongs_to :table_session
 
   # ========================================
   # Enum定義
@@ -37,7 +37,7 @@ class Payment < ApplicationRecord
   # ========================================
   # コールバック
   # ========================================
-  after_update :mark_order_as_paid, if: :saved_change_to_status?
+  after_update :complete_table_session, if: :saved_change_to_status?
 
   # ========================================
   # スコープ
@@ -59,7 +59,8 @@ class Payment < ApplicationRecord
 
   private
 
-  def mark_order_as_paid
-    order.paid! if completed? && order.delivered?
+  def complete_table_session
+    # 支払いが完了したらテーブルセッションを完了状態にする
+    table_session.complete! if completed? && table_session.active?
   end
 end

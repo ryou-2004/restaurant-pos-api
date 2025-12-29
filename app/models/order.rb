@@ -9,9 +9,9 @@ class Order < ApplicationRecord
   # ========================================
   belongs_to :store
   belongs_to :tenant
+  belongs_to :table_session, optional: true
   has_many :order_items, dependent: :destroy
   has_one :kitchen_queue, dependent: :destroy
-  has_one :payment, dependent: :destroy
 
   # ネストされた属性の受け入れ
   accepts_nested_attributes_for :order_items, allow_destroy: true
@@ -23,8 +23,8 @@ class Order < ApplicationRecord
     pending: 0,    # 注文受付済み
     cooking: 1,    # 調理中
     ready: 2,      # 調理完了
-    delivered: 3,  # 配膳済み
-    paid: 4        # 会計済み
+    delivered: 3   # 配膳済み
+    # 注意: 'paid' は削除。会計はTableSessionとPaymentで管理
   }
 
   # ========================================
@@ -44,9 +44,9 @@ class Order < ApplicationRecord
   # ========================================
   # スコープ
   # ========================================
-  scope :active, -> { where.not(status: :paid) }
   scope :today, -> { where('created_at >= ?', Time.current.beginning_of_day) }
   scope :by_table, ->(table_id) { where(table_id: table_id) }
+  scope :by_session, ->(session_id) { where(table_session_id: session_id) }
 
   # ========================================
   # パブリックメソッド
@@ -70,10 +70,6 @@ class Order < ApplicationRecord
 
   def can_deliver?
     ready?
-  end
-
-  def can_pay?
-    delivered?
   end
 
   private
