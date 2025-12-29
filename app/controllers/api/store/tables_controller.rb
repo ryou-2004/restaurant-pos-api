@@ -25,7 +25,10 @@ module Api
           number: table.number,
           capacity: table.capacity,
           status: table.status,
-          qr_code: table.qr_code
+          qr_code: table.qr_code,
+          position_x: table.position_x,
+          position_y: table.position_y,
+          shape: table.shape
         }
       end
     end

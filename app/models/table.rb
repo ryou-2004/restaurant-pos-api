@@ -15,6 +15,12 @@ class Table < ApplicationRecord
     cleaning: 3    # 清掃中
   }
 
+  enum :shape, {
+    square: 'square',      # 正方形
+    rectangle: 'rectangle', # 長方形
+    circle: 'circle'       # 円形
+  }, _prefix: true
+
   # ========================================
   # バリデーション
   # ========================================

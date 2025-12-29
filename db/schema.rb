@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_29_093346) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_29_173941) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -168,6 +168,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_29_093346) do
     t.string "qr_code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "position_x", default: 0.0
+    t.float "position_y", default: 0.0
+    t.string "shape", default: "square"
     t.index ["qr_code"], name: "index_tables_on_qr_code", unique: true, where: "(qr_code IS NOT NULL)"
     t.index ["store_id", "number"], name: "index_tables_on_store_id_and_number", unique: true
     t.index ["store_id"], name: "index_tables_on_store_id"
