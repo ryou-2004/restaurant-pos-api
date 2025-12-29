@@ -21,11 +21,17 @@ class Api::Customer::AuthenticationController < ActionController::API
     # 複数人が同じテーブルで何度でもログインできるように
     # ステータスチェックと変更を削除
 
-    # アクティブなテーブルセッションを検索または作成
-    table_session = TableSession.find_or_create_active_session(
+    # アクティブなテーブルセッションを検索（店員が作成済みのもの）
+    table_session = TableSession.find_by(
       store_id: table.store_id,
-      table_id: table.id
+      table_id: table.id,
+      status: :active
     )
+
+    unless table_session
+      render json: { error: 'このテーブルはまだ利用開始されていません。店員にお声がけください。' }, status: :forbidden
+      return
+    end
 
     # JWT トークン生成
     token_payload = {

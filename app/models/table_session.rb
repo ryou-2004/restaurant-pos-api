@@ -60,22 +60,4 @@ class TableSession < ApplicationRecord
   def complete!
     update!(status: :completed, ended_at: Time.current)
   end
-
-  # アクティブなセッションを検索または作成
-  def self.find_or_create_active_session(store_id:, table_id:, party_size: nil)
-    # 既存のアクティブなセッションを検索
-    active_session = where(store_id: store_id, table_id: table_id, status: :active).first
-
-    # 見つかればそれを返す
-    return active_session if active_session
-
-    # なければ新規作成
-    create!(
-      store_id: store_id,
-      table_id: table_id,
-      party_size: party_size,
-      status: :active,
-      started_at: Time.current
-    )
-  end
 end
