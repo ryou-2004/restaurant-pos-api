@@ -66,7 +66,7 @@ Rails.application.routes.draw do
       resources :menu_items, only: [:index, :show]
       resources :tables, only: [:index, :show]
 
-      resources :table_sessions, only: [:create] do
+      resources :table_sessions, only: [:index, :create] do
         member do
           patch :complete
         end

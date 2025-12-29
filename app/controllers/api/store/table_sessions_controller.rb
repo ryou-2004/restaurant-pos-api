@@ -1,4 +1,26 @@
 class Api::Store::TableSessionsController < Api::Store::BaseController
+  # アクティブなテーブルセッション一覧取得
+  def index
+    @table_sessions = current_store.table_sessions
+                                   .active
+                                   .includes(:table, :orders)
+                                   .order(started_at: :asc)
+
+    render json: @table_sessions.map { |session|
+      {
+        id: session.id,
+        table_id: session.table_id,
+        table_number: session.table.number,
+        party_size: session.party_size,
+        status: session.status,
+        started_at: session.started_at,
+        duration_minutes: session.duration_in_minutes,
+        order_count: session.orders.count,
+        total_amount: session.total_amount
+      }
+    }
+  end
+
   # テーブルセッション作成（店員が顧客を案内したとき）
   def create
     table = current_store.tables.find_by(id: params[:table_id])
