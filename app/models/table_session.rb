@@ -32,8 +32,9 @@ class TableSession < ApplicationRecord
   # スコープ
   # ========================================
   scope :active_sessions, -> { where(status: :active) }
+  scope :completed, -> { where(status: :completed) }
   scope :by_table, ->(table_id) { where(table_id: table_id) }
-  scope :today, -> { where('started_at >= ?', Time.current.beginning_of_day) }
+  scope :today, -> { where('ended_at >= ?', Time.current.beginning_of_day) }
 
   # ========================================
   # パブリックメソッド
