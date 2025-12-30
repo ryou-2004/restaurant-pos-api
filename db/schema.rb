@@ -10,9 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_30_151138) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_30_183640) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "activity_logs", force: :cascade do |t|
+    t.string "user_type", null: false
+    t.bigint "user_id", null: false
+    t.bigint "tenant_id"
+    t.bigint "store_id"
+    t.string "action_type", null: false
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.jsonb "metadata", default: {}, null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action_type"], name: "index_activity_logs_on_action_type"
+    t.index ["created_at"], name: "index_activity_logs_on_created_at"
+    t.index ["metadata"], name: "index_activity_logs_on_metadata", using: :gin
+    t.index ["resource_type", "resource_id"], name: "index_activity_logs_on_resource"
+    t.index ["store_id", "created_at"], name: "index_activity_logs_on_store_and_created_at"
+    t.index ["store_id"], name: "index_activity_logs_on_store_id"
+    t.index ["tenant_id", "action_type", "created_at"], name: "index_activity_logs_on_tenant_action_created"
+    t.index ["tenant_id", "created_at"], name: "index_activity_logs_on_tenant_and_created_at"
+    t.index ["tenant_id"], name: "index_activity_logs_on_tenant_id"
+    t.index ["user_type", "user_id", "created_at"], name: "index_activity_logs_on_user_and_created_at"
+    t.index ["user_type", "user_id"], name: "index_activity_logs_on_user"
+  end
 
   create_table "kitchen_queues", force: :cascade do |t|
     t.bigint "tenant_id", null: false
@@ -254,6 +280,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_30_151138) do
     t.index ["subdomain"], name: "index_tenants_on_subdomain", unique: true
   end
 
+  add_foreign_key "activity_logs", "stores", on_delete: :cascade
+  add_foreign_key "activity_logs", "tenants", on_delete: :cascade
   add_foreign_key "kitchen_queues", "orders"
   add_foreign_key "kitchen_queues", "stores"
   add_foreign_key "kitchen_queues", "tenants"
