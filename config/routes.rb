@@ -75,6 +75,13 @@ Rails.application.routes.draw do
           patch :complete
         end
       end
+
+      resources :reports, only: [] do
+        collection do
+          get :daily
+          get :monthly
+        end
+      end
     end
 
     namespace :customer do
