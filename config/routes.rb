@@ -13,6 +13,12 @@ Rails.application.routes.draw do
 
       resources :tenants, only: [:index, :show, :create, :update]
       resources :subscriptions, only: [:index, :show, :update]
+
+      resources :activity_logs, only: [:index, :show] do
+        collection do
+          get :stats
+        end
+      end
     end
 
     namespace :tenant do
@@ -35,6 +41,12 @@ Rails.application.routes.draw do
       end
 
       resource :subscription, only: [:show, :update]
+
+      resources :activity_logs, only: [:index, :show] do
+        collection do
+          get :stats
+        end
+      end
     end
 
     namespace :store do
@@ -82,6 +94,8 @@ Rails.application.routes.draw do
           get :monthly
         end
       end
+
+      resources :activity_logs, only: [:index, :show]
     end
 
     namespace :customer do
