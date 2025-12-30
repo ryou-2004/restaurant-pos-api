@@ -47,8 +47,12 @@ Rails.application.routes.draw do
           patch :start_cooking
           patch :mark_as_ready
           patch :deliver
+          post :print_kitchen_ticket
         end
       end
+
+      resources :print_templates, only: [:index, :show, :update]
+      resources :print_logs, only: [:index, :show, :create]
 
       resources :kitchen_queues, only: [:index, :show, :update] do
         member do
