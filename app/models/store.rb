@@ -5,6 +5,8 @@ class Store < ApplicationRecord
   belongs_to :tenant
   has_many :orders, dependent: :destroy
   has_many :kitchen_queues, dependent: :destroy
+  has_many :table_sessions, dependent: :destroy
+  has_many :payments, through: :table_sessions
   has_many :menu_items, through: :tenant
 
   # ========================================
