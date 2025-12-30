@@ -2,7 +2,7 @@ class Api::Store::OrdersController < Api::Store::BaseController
   # ========================================
   # before_action定義
   # ========================================
-  before_action :set_order, only: [:show, :update, :start_cooking, :mark_as_ready, :deliver]
+  before_action :set_order, only: [:show, :update, :start_cooking, :mark_as_ready, :deliver, :print_kitchen_ticket]
 
   # ========================================
   # CRUD操作
@@ -88,6 +88,31 @@ class Api::Store::OrdersController < Api::Store::BaseController
     else
       render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
     end
+  end
+
+  # POST /api/store/orders/:id/print_kitchen_ticket
+  def print_kitchen_ticket
+    # 印刷機能が有効かチェック
+    unless current_tenant.subscription.printing_enabled?
+      return render json: { error: 'プランで印刷機能が利用できません' }, status: :forbidden
+    end
+
+    store = @order.store
+    print_service = PrintService.new(store)
+
+    print_data = print_service.generate_kitchen_ticket(@order)
+
+    # 印刷フラグを更新（最初の印刷時のみ）
+    @order.update(needs_printing: true, printed_at: Time.current) if @order.printed_at.nil?
+
+    render json: {
+      html: print_data[:html],
+      order_id: print_data[:order_id],
+      template_id: print_data[:template_id]
+    }
+  rescue StandardError => e
+    Rails.logger.error "印刷データ生成エラー: #{e.message}"
+    render json: { error: '印刷データの生成に失敗しました' }, status: :internal_server_error
   end
 
   private

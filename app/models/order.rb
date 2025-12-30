@@ -12,6 +12,7 @@ class Order < ApplicationRecord
   belongs_to :table_session, optional: true
   has_many :order_items, dependent: :destroy
   has_one :kitchen_queue, dependent: :destroy
+  has_many :print_logs, dependent: :destroy
 
   # ネストされた属性の受け入れ
   accepts_nested_attributes_for :order_items, allow_destroy: true

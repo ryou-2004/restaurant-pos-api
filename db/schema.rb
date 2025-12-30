@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_29_173941) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_30_151138) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -76,6 +76,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_29_173941) do
     t.datetime "updated_at", null: false
     t.bigint "store_id", null: false
     t.bigint "table_session_id"
+    t.boolean "needs_printing", default: false
+    t.datetime "printed_at"
     t.index ["created_at"], name: "index_orders_on_created_at"
     t.index ["status"], name: "index_orders_on_status"
     t.index ["store_id", "order_number"], name: "index_orders_on_store_id_and_order_number", unique: true
@@ -101,6 +103,40 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_29_173941) do
     t.index ["table_session_id"], name: "index_payments_on_table_session_id"
     t.index ["tenant_id", "created_at"], name: "index_payments_on_tenant_id_and_created_at"
     t.index ["tenant_id"], name: "index_payments_on_tenant_id"
+  end
+
+  create_table "print_logs", force: :cascade do |t|
+    t.bigint "tenant_id", null: false
+    t.bigint "store_id", null: false
+    t.bigint "order_id", null: false
+    t.bigint "print_template_id"
+    t.datetime "printed_at", null: false
+    t.string "status", default: "success", null: false
+    t.text "error_message"
+    t.string "printer_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_print_logs_on_order_id"
+    t.index ["print_template_id"], name: "index_print_logs_on_print_template_id"
+    t.index ["printed_at"], name: "index_print_logs_on_printed_at"
+    t.index ["status"], name: "index_print_logs_on_status"
+    t.index ["store_id"], name: "index_print_logs_on_store_id"
+    t.index ["tenant_id"], name: "index_print_logs_on_tenant_id"
+  end
+
+  create_table "print_templates", force: :cascade do |t|
+    t.bigint "tenant_id", null: false
+    t.bigint "store_id"
+    t.string "template_type", default: "kitchen_ticket", null: false
+    t.string "name", null: false
+    t.text "content", null: false
+    t.boolean "is_active", default: true
+    t.jsonb "settings", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["store_id"], name: "index_print_templates_on_store_id"
+    t.index ["tenant_id", "template_type", "is_active"], name: "idx_on_tenant_id_template_type_is_active_55adf4752a"
+    t.index ["tenant_id"], name: "index_print_templates_on_tenant_id"
   end
 
   create_table "staff_users", force: :cascade do |t|
@@ -136,6 +172,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_29_173941) do
     t.datetime "expires_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "printing_enabled", default: false
     t.index ["expires_at"], name: "index_subscriptions_on_expires_at"
     t.index ["plan"], name: "index_subscriptions_on_plan"
     t.index ["tenant_id"], name: "index_subscriptions_on_tenant_id"
@@ -228,6 +265,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_29_173941) do
   add_foreign_key "orders", "tenants"
   add_foreign_key "payments", "table_sessions"
   add_foreign_key "payments", "tenants"
+  add_foreign_key "print_logs", "orders"
+  add_foreign_key "print_logs", "print_templates"
+  add_foreign_key "print_logs", "stores"
+  add_foreign_key "print_logs", "tenants"
+  add_foreign_key "print_templates", "stores"
+  add_foreign_key "print_templates", "tenants"
   add_foreign_key "stores", "tenants"
   add_foreign_key "subscriptions", "tenants"
   add_foreign_key "table_sessions", "stores"

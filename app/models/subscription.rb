@@ -48,14 +48,17 @@ class Subscription < ApplicationRecord
     when 'basic'
       self.realtime_enabled = false
       self.polling_enabled = false
+      self.printing_enabled = false
       self.max_stores ||= 1
     when 'standard'
       self.realtime_enabled = false
       self.polling_enabled = true
+      self.printing_enabled = true
       self.max_stores ||= 20
     when 'enterprise'
       self.realtime_enabled = true
       self.polling_enabled = true
+      self.printing_enabled = true
       self.max_stores ||= 999
     end
   end
