@@ -43,7 +43,7 @@ class Payment < ApplicationRecord
   # スコープ
   # ========================================
   scope :completed, -> { where(status: :completed) }
-  scope :today, -> { where('created_at >= ?', Time.current.beginning_of_day) }
+  scope :today, -> { where('paid_at >= ?', Time.current.beginning_of_day) }
 
   # ========================================
   # パブリックメソッド
