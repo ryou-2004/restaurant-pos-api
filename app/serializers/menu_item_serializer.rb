@@ -12,6 +12,9 @@ class MenuItemSerializer
       category: @menu_item.category,
       description: @menu_item.description,  # フロントエンドで表示される
       available: @menu_item.available,
+      image_url: @menu_item.image_url,      # 商品画像URL
+      allergens: @menu_item.allergens,      # アレルゲン情報
+      spice_level: @menu_item.spice_level,  # 辛さレベル（0-5）
       created_at: @menu_item.created_at,
       updated_at: @menu_item.updated_at
     }
