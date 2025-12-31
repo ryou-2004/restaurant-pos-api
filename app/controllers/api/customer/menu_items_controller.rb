@@ -1,9 +1,18 @@
 class Api::Customer::MenuItemsController < Api::Customer::BaseController
+  include Loggable
+
   def index
     # 現在のテナントの利用可能なメニュー項目のみを返す（カテゴリー順でソート）
     @menu_items = current_tenant.menu_items
                                 .where(available: true)
                                 .ordered_by_category
+
+    # メニュー一覧閲覧を記録
+    log_activity(:page_accessed, metadata: {
+      page: 'menu_items',
+      action: 'index',
+      item_count: @menu_items.count
+    })
 
     render json: @menu_items.map { |item| serialize_menu_item(item) }
   end
