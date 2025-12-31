@@ -14,6 +14,7 @@ class Api::Store::OrdersController < Api::Store::BaseController
   def index
     @orders = current_tenant.orders
                             .includes(:order_items => :menu_item)
+                            .active  # キャンセル済みの注文を除外
 
     # status パラメータでフィルタリング
     @orders = @orders.where(status: params[:status]) if params[:status].present?
