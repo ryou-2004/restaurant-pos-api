@@ -1,4 +1,6 @@
 class Api::Store::TableSessionsController < Api::Store::BaseController
+  include Loggable
+
   # アクティブなテーブルセッション一覧取得
   def index
     @table_sessions = current_store.table_sessions
@@ -52,6 +54,13 @@ class Api::Store::TableSessionsController < Api::Store::BaseController
       started_at: Time.current
     )
 
+    # テーブルセッション開始を記録
+    log_business_event(:table_session_started, @table_session, metadata: {
+      table_id: table.id,
+      table_number: table.number,
+      party_size: @table_session.party_size
+    })
+
     render json: {
       id: @table_session.id,
       table_id: @table_session.table_id,
@@ -79,6 +88,13 @@ class Api::Store::TableSessionsController < Api::Store::BaseController
     end
 
     @table_session.complete!
+
+    # テーブルセッション終了を記録
+    log_business_event(:table_session_ended, @table_session, metadata: {
+      table_id: @table_session.table_id,
+      duration_minutes: @table_session.duration_in_minutes,
+      total_amount: @table_session.total_amount
+    })
 
     render json: {
       id: @table_session.id,
