@@ -1,6 +1,8 @@
 module Api
   module Tenant
     class TablesController < Api::Tenant::BaseController
+      include Loggable
+
       before_action :require_manager_or_above
       before_action :set_table, only: [:show, :update, :destroy]
 
@@ -23,6 +25,13 @@ module Api
         @table = current_tenant.tables.build(table_params)
 
         if @table.save
+          # テーブル作成を記録
+          log_activity(:create, resource: @table, metadata: {
+            store_id: @table.store_id,
+            number: @table.number,
+            capacity: @table.capacity
+          })
+
           render json: serialize_table(@table), status: :created
         else
           render json: { errors: @table.errors.full_messages }, status: :unprocessable_entity
@@ -31,7 +40,14 @@ module Api
 
       # PATCH /api/tenant/tables/:id
       def update
+        before_attrs = @table.attributes.slice('number', 'capacity', 'status')
+
         if @table.update(table_params)
+          after_attrs = @table.attributes.slice('number', 'capacity', 'status')
+
+          # テーブル更新を記録
+          log_crud_action(:update, @table, before: before_attrs, after: after_attrs)
+
           render json: serialize_table(@table)
         else
           render json: { errors: @table.errors.full_messages }, status: :unprocessable_entity
@@ -40,6 +56,12 @@ module Api
 
       # DELETE /api/tenant/tables/:id
       def destroy
+        # テーブル削除を記録
+        log_activity(:delete, resource: @table, metadata: {
+          number: @table.number,
+          capacity: @table.capacity
+        })
+
         @table.destroy
         head :no_content
       end
