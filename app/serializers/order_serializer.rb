@@ -12,6 +12,10 @@ class OrderSerializer
       total_amount: @order.total_amount,
       item_count: @order.item_count,
       notes: @order.notes,
+      cancelled: @order.cancelled?,
+      cancelled_at: @order.cancelled_at,
+      cancellation_reason: @order.cancellation_reason,
+      can_cancel: @order.can_cancel?,
       order_items: order_items_json,
       created_at: @order.created_at,
       updated_at: @order.updated_at
