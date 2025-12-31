@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_30_183640) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_31_164303) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -104,6 +104,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_30_183640) do
     t.bigint "table_session_id"
     t.boolean "needs_printing", default: false
     t.datetime "printed_at"
+    t.datetime "cancelled_at"
+    t.text "cancellation_reason"
     t.index ["created_at"], name: "index_orders_on_created_at"
     t.index ["status"], name: "index_orders_on_status"
     t.index ["store_id", "order_number"], name: "index_orders_on_store_id_and_order_number", unique: true
