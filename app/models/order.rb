@@ -48,6 +48,8 @@ class Order < ApplicationRecord
   scope :today, -> { where('created_at >= ?', Time.current.beginning_of_day) }
   scope :by_table, ->(table_id) { where(table_id: table_id) }
   scope :by_session, ->(session_id) { where(table_session_id: session_id) }
+  scope :active, -> { where(cancelled_at: nil) }
+  scope :cancelled, -> { where.not(cancelled_at: nil) }
 
   # ========================================
   # パブリックメソッド
@@ -71,6 +73,26 @@ class Order < ApplicationRecord
 
   def can_deliver?
     ready?
+  end
+
+  # キャンセル可能かチェック（調理前のみ）
+  def can_cancel?
+    pending? && !cancelled?
+  end
+
+  # キャンセル済みかチェック
+  def cancelled?
+    cancelled_at.present?
+  end
+
+  # 注文をキャンセル
+  def cancel!(reason)
+    raise StandardError, 'この注文はキャンセルできません' unless can_cancel?
+
+    update!(
+      cancelled_at: Time.current,
+      cancellation_reason: reason
+    )
   end
 
   private
