@@ -1,4 +1,6 @@
 class Api::Tenant::UsersController < Api::Tenant::BaseController
+  include Loggable
+
   before_action :require_owner, except: [:index, :show]
   before_action :set_user, only: [:show, :update, :destroy]
 
@@ -19,6 +21,13 @@ class Api::Tenant::UsersController < Api::Tenant::BaseController
     @user.password = SecureRandom.hex(16) if @user.password.blank?
 
     if @user.save
+      # ユーザー作成を記録（パスワードは自動的にマスキングされる）
+      log_activity(:create, resource: @user, metadata: {
+        name: @user.name,
+        email: @user.email,
+        role: @user.role
+      })
+
       render json: serialize_user(@user), status: :created
     else
       render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
@@ -26,7 +35,14 @@ class Api::Tenant::UsersController < Api::Tenant::BaseController
   end
 
   def update
+    before_attrs = @user.attributes.slice('name', 'email', 'role')
+
     if @user.update(user_params)
+      after_attrs = @user.attributes.slice('name', 'email', 'role')
+
+      # ユーザー更新を記録
+      log_crud_action(:update, @user, before: before_attrs, after: after_attrs)
+
       render json: serialize_user(@user)
     else
       render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
@@ -34,6 +50,12 @@ class Api::Tenant::UsersController < Api::Tenant::BaseController
   end
 
   def destroy
+    # ユーザー削除を記録
+    log_activity(:delete, resource: @user, metadata: {
+      name: @user.name,
+      email: @user.email
+    })
+
     @user.destroy
     head :no_content
   end
