@@ -1,4 +1,6 @@
 class Api::Store::PaymentsController < Api::Store::BaseController
+  include Loggable
+
   # ========================================
   # before_action定義
   # ========================================
@@ -58,8 +60,22 @@ class Api::Store::PaymentsController < Api::Store::BaseController
     end
 
     if @payment.mark_as_completed!
+      # 決済完了を記録
+      log_business_event(:payment_completed, @payment, metadata: {
+        payment_method: @payment.payment_method,
+        amount: @payment.amount,
+        table_session_id: @payment.table_session_id
+      })
+
       render json: PaymentSerializer.new(@payment).as_json
     else
+      # 決済失敗を記録
+      log_business_event(:payment_failed, @payment, metadata: {
+        payment_method: @payment.payment_method,
+        amount: @payment.amount,
+        reason: @payment.errors.full_messages.join(', ')
+      })
+
       render json: { errors: @payment.errors.full_messages }, status: :unprocessable_entity
     end
   end
