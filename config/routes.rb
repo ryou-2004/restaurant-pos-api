@@ -103,7 +103,11 @@ Rails.application.routes.draw do
       post 'auth/logout', to: 'authentication#logout'
 
       resources :menu_items, only: [:index]
-      resources :orders, only: [:index, :create]
+      resources :orders, only: [:index, :create] do
+        member do
+          post :cancel
+        end
+      end
     end
   end
 end
