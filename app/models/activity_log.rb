@@ -16,6 +16,7 @@ class ActivityLog < ApplicationRecord
     order_placed order_cooking_started order_ready order_delivered order_cancelled
     payment_completed payment_failed
     table_session_started table_session_ended
+    staff_called staff_call_resolved
     menu_viewed page_accessed
   ].freeze
 

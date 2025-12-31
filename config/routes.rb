@@ -95,6 +95,13 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :staff_calls, only: [:index] do
+        member do
+          patch :acknowledge
+          patch :resolve
+        end
+      end
+
       resources :activity_logs, only: [:index, :show]
     end
 
@@ -108,6 +115,7 @@ Rails.application.routes.draw do
           post :cancel
         end
       end
+      resources :staff_calls, only: [:index, :create]
     end
   end
 end
