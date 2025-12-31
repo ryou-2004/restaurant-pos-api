@@ -1,4 +1,6 @@
 class Api::Store::OrdersController < Api::Store::BaseController
+  include Loggable
+
   # ========================================
   # before_action定義
   # ========================================
@@ -31,6 +33,14 @@ class Api::Store::OrdersController < Api::Store::BaseController
     service = OrderService.new(current_tenant)
     @order = service.create_order(order_params.to_h.deep_symbolize_keys)
 
+    # 注文作成を記録
+    log_business_event(:order_placed, @order, metadata: {
+      order_number: @order.order_number,
+      total_amount: @order.total_amount,
+      item_count: @order.order_items.count,
+      table_id: @order.table_id
+    })
+
     render json: OrderSerializer.new(@order).as_json, status: :created
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
@@ -57,6 +67,12 @@ class Api::Store::OrdersController < Api::Store::BaseController
 
     if @order.update(status: :cooking)
       update_kitchen_queue_status(@order, :in_progress)
+
+      # 調理開始を記録
+      log_business_event(:order_cooking_started, @order, metadata: {
+        order_number: @order.order_number
+      })
+
       render json: OrderSerializer.new(@order).as_json
     else
       render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
@@ -71,6 +87,12 @@ class Api::Store::OrdersController < Api::Store::BaseController
 
     if @order.update(status: :ready)
       update_kitchen_queue_status(@order, :completed)
+
+      # 調理完了を記録
+      log_business_event(:order_ready, @order, metadata: {
+        order_number: @order.order_number
+      })
+
       render json: OrderSerializer.new(@order).as_json
     else
       render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
@@ -84,6 +106,11 @@ class Api::Store::OrdersController < Api::Store::BaseController
     end
 
     if @order.update(status: :delivered)
+      # 配膳完了を記録
+      log_business_event(:order_delivered, @order, metadata: {
+        order_number: @order.order_number
+      })
+
       render json: OrderSerializer.new(@order).as_json
     else
       render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
