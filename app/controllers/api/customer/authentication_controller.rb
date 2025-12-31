@@ -1,4 +1,6 @@
 class Api::Customer::AuthenticationController < ActionController::API
+  include Loggable
+
   # このコントローラーのみ認証不要（ログインエンドポイントのため）
   skip_before_action :authenticate_customer_session, raise: false
 
@@ -33,6 +35,14 @@ class Api::Customer::AuthenticationController < ActionController::API
       return
     end
 
+    # QRログイン成功を記録
+    log_authentication(:login, table_session, success: true, metadata: {
+      qr_code: qr_code,
+      table_id: table.id,
+      table_number: table.number,
+      login_method: 'qr_code'
+    })
+
     # JWT トークン生成
     token_payload = {
       table_id: table.id,
@@ -64,7 +74,28 @@ class Api::Customer::AuthenticationController < ActionController::API
   end
 
   def logout
+    @table_session = current_table_session
+
+    if @table_session
+      # ログアウトを記録
+      log_authentication(:logout, @table_session, success: true)
+    end
+
     # 将来的にセッション無効化やテーブル状態のリセットを実装可能
     render json: { message: 'ログアウトしました' }, status: :ok
+  end
+
+  private
+
+  def current_table_session
+    header = request.headers['Authorization']
+    token = header.split(' ').last if header
+    decoded = JsonWebToken.decode(token)
+
+    if decoded && decoded[:user_type] == 'customer'
+      TableSession.find_by(id: decoded[:table_session_id])
+    end
+  rescue
+    nil
   end
 end
