@@ -8,14 +8,14 @@ class Table < ApplicationRecord
   # ========================================
   # Enum定義
   # ========================================
-  enum :status, {
+  enum status: {
     available: 0,  # 空席
     occupied: 1,   # 使用中
     reserved: 2,   # 予約済み
     cleaning: 3    # 清掃中
   }
 
-  enum :shape, {
+  enum shape: {
     square: 'square',      # 正方形
     rectangle: 'rectangle', # 長方形
     circle: 'circle'       # 円形
